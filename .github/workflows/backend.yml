@@ -147,12 +147,15 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_API }}
         run: vercel build --prod --token="$VERCEL_TOKEN"
 
-      # Sin reintento: si falla, no se despliega (FR-013).
+      # Sin reintento: si falla, no se despliega (FR-013). Prisma imprime el host de la base;
+      # se enmascara para que no aparezca en el log (FR-019).
       - name: Migraciones de producción
         env:
           DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
           DATABASE_URL_UNPOOLED: ${{ secrets.PROD_DATABASE_URL }}
-        run: npx prisma migrate deploy
+        run: |
+          echo "::add-mask::$(node -e 'console.log(new URL(process.env.DATABASE_URL).hostname)')"
+          npx prisma migrate deploy
 
       # Un reintento ante un fallo de la plataforma (FR-013a).
       - name: Desplegar en Vercel
