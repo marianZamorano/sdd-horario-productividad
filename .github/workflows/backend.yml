@@ -1,0 +1,90 @@
+# Validación del backend en cada push que lo modifica (specs/002-ci-cd-pipeline).
+name: backend
+
+on:
+  push:
+    # '**' excluye los push de tags, en los que GitHub ignora `paths` (research R2).
+    branches: ['**']
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+
+# En main se serializa sin cancelar (nunca se corta una migración); en otras ramas solo
+# importa el último commit (research R10).
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: horario
+          POSTGRES_PASSWORD: horario
+          POSTGRES_DB: horario_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U horario"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    # Valores de prueba para la base desechable del job; no son secretos.
+    env:
+      DATABASE_URL: postgresql://horario:horario@localhost:5432/horario_ci?schema=public
+      DATABASE_URL_TEST: postgresql://horario:horario@localhost:5432/horario_ci?schema=public
+      JWT_SECRET: ci-secret
+      CORS_ORIGIN: http://localhost:5173
+      PORT: '3000'
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint:ci
+
+      - name: Tests unitarios
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # Antes que los e2e, para aplicar las migraciones sobre la base vacía (research R5).
+      - name: Prueba de arranque
+        run: |
+          npx prisma migrate deploy
+          node dist/main > backend.log 2>&1 &
+          body=$(curl --silent --fail --retry 30 --retry-delay 2 --retry-connrefused \
+            --retry-all-errors --max-time 5 http://localhost:3000/api/health) || {
+            echo "::error::El backend no respondió en /api/health"
+            exit 1
+          }
+          if [ "$body" != '{"status":"ok"}' ]; then
+            echo "::error::Respuesta inesperada de /api/health: $body"
+            exit 1
+          fi
+
+      - name: Tests e2e
+        run: npm run test:e2e
+
+      - name: Log del backend
+        if: failure()
+        run: cat backend.log || true

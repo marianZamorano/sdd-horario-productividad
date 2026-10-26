@@ -1,0 +1,63 @@
+# Validación del frontend en cada push que lo modifica (specs/002-ci-cd-pipeline).
+name: frontend
+
+on:
+  push:
+    # '**' excluye los push de tags, en los que GitHub ignora `paths` (research R2).
+    branches: ['**']
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
+
+# En main se serializa sin cancelar; en otras ramas solo importa el último commit (research R10).
+concurrency:
+  group: frontend-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Tests unitarios
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Prueba de arranque
+        run: |
+          npm run preview -- --port 4173 --strictPort > frontend.log 2>&1 &
+          body=$(curl --silent --fail --retry 30 --retry-delay 2 --retry-connrefused \
+            --retry-all-errors --max-time 5 http://localhost:4173/) || {
+            echo "::error::El frontend compilado no respondió en /"
+            exit 1
+          }
+          if ! grep -q '<div id="root">' <<< "$body"; then
+            echo "::error::La página principal no contiene <div id=\"root\">"
+            exit 1
+          fi
+
+      - name: Log del frontend
+        if: failure()
+        run: cat frontend.log || true

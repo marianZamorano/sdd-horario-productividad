@@ -34,8 +34,8 @@ escribe primero) porque cambia el comportamiento de `cors.ts`.
 
 **Purpose**: dejar los paquetes listos para que CI los valide sin autocorrecciones
 
-- [ ] T001 Añadir el script `"lint:ci": "eslint \"{src,apps,libs,test}/**/*.ts\""` (mismo glob que `lint`, sin `--fix`) en `backend/package.json`, sin tocar el script `lint` existente (research R4)
-- [ ] T002 Ejecutar la línea base local y confirmar que todo está en verde antes de escribir workflows: en `backend/` `npm run lint:ci`, `npm test`, `npm run build`, `npm run test:e2e` (con `docker compose up -d`); en `frontend/` `npm run lint`, `npm test`, `npm run build`. Si algo falla, arreglarlo antes de seguir
+- [X] T001 Añadir el script `"lint:ci": "eslint \"{src,apps,libs,test}/**/*.ts\""` (mismo glob que `lint`, sin `--fix`) en `backend/package.json`, sin tocar el script `lint` existente (research R4)
+- [X] T002 Ejecutar la línea base local y confirmar que todo está en verde antes de escribir workflows: en `backend/` `npm run lint:ci`, `npm test`, `npm run build`, `npm run test:e2e` (con `docker compose up -d`); en `frontend/` `npm run lint`, `npm test`, `npm run build`. Si algo falla, arreglarlo antes de seguir
 
 ---
 
@@ -45,8 +45,8 @@ escribe primero) porque cambia el comportamiento de `cors.ts`.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 [P] Añadir `"git": { "deploymentEnabled": false }` en `backend/vercel.json`, conservando `$schema`, `framework` y `buildCommand` (el `buildCommand` se cambia en T010) (research R11)
-- [ ] T004 [P] Añadir `"git": { "deploymentEnabled": false }` en `frontend/vercel.json`, conservando `$schema`, `framework` y `rewrites` (research R11)
+- [X] T003 [P] Añadir `"git": { "deploymentEnabled": false }` en `backend/vercel.json`, conservando `$schema`, `framework` y `buildCommand` (el `buildCommand` se cambia en T010) (research R11)
+- [X] T004 [P] Añadir `"git": { "deploymentEnabled": false }` en `frontend/vercel.json`, conservando `$schema`, `framework` y `rewrites` (research R11)
 
 **Checkpoint**: ningún push puede disparar un despliegue automático de Vercel
 
@@ -60,7 +60,7 @@ escribe primero) porque cambia el comportamiento de `cors.ts`.
 
 ### Implementation for User Story 1
 
-- [ ] T005 [US1] Crear `.github/workflows/backend.yml` con `name: backend` y solo el job `validate`, según [contracts/ci-workflows.md](contracts/ci-workflows.md) §backend.yml y [contracts/smoke-checks.md](contracts/smoke-checks.md) §B1:
+- [X] T005 [US1] Crear `.github/workflows/backend.yml` con `name: backend` y solo el job `validate`, según [contracts/ci-workflows.md](contracts/ci-workflows.md) §backend.yml y [contracts/smoke-checks.md](contracts/smoke-checks.md) §B1:
   - `on.push.branches: ['**']`, `on.push.paths: ['backend/**', '.github/workflows/backend.yml']`
   - `concurrency: { group: backend-${{ github.ref }}, cancel-in-progress: ${{ github.ref != 'refs/heads/main' }} }`
   - `permissions: { contents: read }`
@@ -68,7 +68,7 @@ escribe primero) porque cambia el comportamiento de `cors.ts`.
   - `env` del job: `DATABASE_URL` y `DATABASE_URL_TEST` = `postgresql://horario:horario@localhost:5432/horario_ci?schema=public`, `JWT_SECRET: ci-secret`, `CORS_ORIGIN: http://localhost:5173`, `PORT: '3000'`
   - pasos con nombre en español, en este orden: checkout (`actions/checkout`, major estable actual); `actions/setup-node` con `node-version: 24`, `cache: npm`, `cache-dependency-path: backend/package-lock.json`; "Instalar dependencias" (`npm ci`); "Lint" (`npm run lint:ci`); "Tests unitarios" (`npm test`); "Build" (`npm run build`); "Prueba de arranque" (`npx prisma migrate deploy`, `node dist/main > backend.log 2>&1 &`, espera con `curl --silent --fail --retry 30 --retry-delay 2 --retry-connrefused --retry-all-errors --max-time 5 http://localhost:3000/api/health` y comparación exacta del cuerpo con `{"status":"ok"}`, con `::error::` explicativo si no coincide); "Tests e2e" (`npm run test:e2e`); "Log del backend" (`cat backend.log`, `if: failure()`)
   - el arranque va **antes** que los e2e para aplicar las migraciones sobre la base vacía (research R5)
-- [ ] T006 [P] [US1] Crear `.github/workflows/frontend.yml` con `name: frontend` y solo el job `validate`, según [contracts/ci-workflows.md](contracts/ci-workflows.md) §frontend.yml y [contracts/smoke-checks.md](contracts/smoke-checks.md) §F1:
+- [X] T006 [P] [US1] Crear `.github/workflows/frontend.yml` con `name: frontend` y solo el job `validate`, según [contracts/ci-workflows.md](contracts/ci-workflows.md) §frontend.yml y [contracts/smoke-checks.md](contracts/smoke-checks.md) §F1:
   - `on.push.branches: ['**']`, `on.push.paths: ['frontend/**', '.github/workflows/frontend.yml']`
   - `concurrency: { group: frontend-${{ github.ref }}, cancel-in-progress: ${{ github.ref != 'refs/heads/main' }} }`, `permissions: { contents: read }`
   - job `validate`: `ubuntu-latest`, `timeout-minutes: 10`, `working-directory: frontend`; Node 24 con caché npm (`frontend/package-lock.json`); pasos "Instalar dependencias" (`npm ci`), "Lint" (`npm run lint`), "Tests unitarios" (`npm test`), "Build" (`npm run build`), "Prueba de arranque" (`npm run preview -- --port 4173 --strictPort > frontend.log 2>&1 &`, `curl` con los mismos reintentos a `http://localhost:4173/` y `grep -q '<div id="root">'` sobre el cuerpo), "Log del frontend" (`cat frontend.log`, `if: failure()`)
