@@ -1,15 +1,30 @@
 <!--
 Sync Impact Report
-- Version change: (plantilla sin versionar) → 1.0.0
-- Modified principles: placeholders [PRINCIPLE_1..5] reemplazados por seis principios:
-  I. Spec primero · II. Stack fijo · III. Núcleo testeable · IV. Contratos explícitos ·
-  V. Seguridad básica · VI. Simplicidad (YAGNI)
-- Added sections: "Restricciones técnicas", "Flujo de desarrollo y quality gates", "Governance"
+- Version change: 1.0.0 → 1.1.0 (MINOR: guía de flujo ampliada materialmente; ningún
+  principio eliminado ni redefinido)
+- Modified principles:
+  II. Stack fijo → II. Stack fijo (añade CI/CD en GitHub Actions; los despliegues los
+  dispara solo el pipeline, sin auto-deploy por Git de Vercel)
+- Modified sections:
+  "Flujo de desarrollo y quality gates": se eliminan los pull requests y los despliegues
+  de preview; validación automática de cada push con flujos independientes por paquete;
+  verificación local antes de push a main; despliegue independiente por paquete solo
+  desde main; migraciones aplicadas solo por el pipeline y compatibles hacia atrás.
+  "Governance": las enmiendas se proponen con un commit (no PR) y la verificación de
+  cumplimiento la hace quien integra en main (no la revisión de PR).
+- Added sections: ninguna
 - Removed sections: ninguna
-- Templates revisados (sin cambios; leen la constitución en tiempo de ejecución):
-  ✅ .specify/templates/plan-template.md (Constitution Check)
+- Impacto en specs en curso:
+  ✅ specs/002-ci-cd-pipeline: deja de haber conflicto (sin PR ni previews, push directo
+  a main validado por el pipeline)
+  ✅ specs/001-schedule-productivity-mvp: ya integrada con merge directo; sin cambios
+- Templates y guías revisados (sin cambios necesarios):
+  ✅ .specify/templates/plan-template.md (Constitution Check lee la constitución)
   ✅ .specify/templates/spec-template.md
   ✅ .specify/templates/tasks-template.md
+  ✅ AGENTS.md (no menciona PRs ni previews)
+  ⚠ README.md: la tarea pendiente "Flujo PR + preview por feature (T080–T081)" queda
+  obsoleta y debe retirarse
 - Follow-up TODOs: ninguno
 -->
 
@@ -40,6 +55,8 @@ personas divergen y el código deja de ser verificable contra un objetivo.
   versionados en `/backend/prisma`).
 - Despliegue: Vercel, con un proyecto por carpeta (`frontend` y `backend`) y Neon Postgres
   instalado desde Vercel Marketplace.
+- CI/CD: GitHub Actions. Los despliegues a Vercel los dispara solo el pipeline; el
+  auto-deploy por integración Git de Vercel MUST estar desactivado.
 - Cambiar cualquier pieza del stack MUST hacerse mediante una enmienda de esta
   constitución; no basta con decidirlo en un `plan.md`.
 
@@ -109,19 +126,30 @@ evitan las fugas más comunes.
 ## Flujo de desarrollo y quality gates
 
 - Una rama por feature, con el nombre que genera Spec Kit (`NNN-nombre-feature`).
-- Antes de cada merge a `main`, MUST estar en verde: lint, tests unitarios y tests e2e de
-  los paquetes afectados.
-- Cada pull request genera un deploy de preview en Vercel para frontend y backend; la
-  revisión funcional se hace sobre ese preview.
-- Las migraciones de Prisma se generan en la rama de la feature y se aplican en producción
-  solo después del merge.
+- No se usan pull requests ni despliegues de preview: el único entorno de despliegue es
+  producción.
+- Cada push a cualquier rama MUST validarse automáticamente en el pipeline de CI, con un
+  flujo independiente para backend y otro para frontend (dependencias, lint, tests
+  unitarios, tests e2e del backend contra una base desechable, build y prueba de
+  arranque).
+- Los cambios se integran en `main` directamente (push o merge local, sin PR). Antes de
+  hacer push a `main`, quien desarrolla MUST ejecutar en local lint y tests de los
+  paquetes afectados.
+- Un push a `main` despliega a producción solo los paquetes cuyo flujo esté en verde; un
+  paquete en rojo MUST NOT desplegarse. Backend y frontend se despliegan de forma
+  independiente.
+- Solo `main` despliega; las demás ramas solo se validan.
+- Las migraciones de Prisma se generan en la rama de la feature y solo las aplica el
+  pipeline en el despliegue a producción desde `main`. Como backend y frontend pueden
+  quedar desplegados en commits distintos, las migraciones y los cambios de API MUST ser
+  compatibles hacia atrás (expand/contract).
 - Las tareas completadas se marcan con `[X]` en `tasks.md` dentro del mismo cambio.
 
 ## Governance
 
 - Esta constitución prevalece sobre cualquier otra guía del repositorio (`AGENTS.md`,
   `README.md`, planes). Ante un conflicto, se corrige el documento subordinado.
-- **Enmiendas**: se proponen con un PR que modifica este archivo, actualiza el Sync Impact
+- **Enmiendas**: se proponen con un commit que modifica este archivo, actualiza el Sync Impact
   Report e indica el impacto sobre las specs en curso. Se ejecutan con
   `/speckit-constitution`.
 - **Versionado** (SemVer): MAJOR si se elimina o redefine un principio de forma
@@ -129,7 +157,7 @@ evitan las fugas más comunes.
   guía; PATCH si se aclara la redacción sin cambiar el significado.
 - **Cumplimiento**: cada `plan.md` MUST pasar el "Constitution Check" antes de la fase de
   diseño y de nuevo después; `/speckit-analyze` trata cualquier violación de un MUST como
-  CRITICAL. Las revisiones de PR verifican estos principios.
+  CRITICAL. Quien integra un cambio en `main` verifica estos principios.
 - La guía operativa para agentes de IA está en `AGENTS.md`.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-26 | **Last Amended**: 2026-10-26
+**Version**: 1.1.0 | **Ratified**: 2026-10-26 | **Last Amended**: 2026-10-26
