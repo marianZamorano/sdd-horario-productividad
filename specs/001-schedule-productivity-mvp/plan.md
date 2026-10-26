@@ -66,10 +66,12 @@ usuario; 6 pantallas (Login, Registro, Disponibilidad, Tareas, Semana, Productiv
 | V. Seguridad básica | bcrypt (coste 10); JWT con un guard global y `@Public()`; filtro `userId` + 404 en recursos ajenos; `.env` ignorado, `.env.example` y variables de Vercel | ✅ | ✅ |
 | VI. Simplicidad | Sin workspaces, sin librería de calendario, sin refresh tokens ni RLS; los valores del algoritmo son constantes | ✅ | ✅ |
 | Restricciones | TS strict, ESLint + Prettier en ambos paquetes, código en inglés, UI en español, configuración por variables de entorno | ✅ | ✅ |
-| Flujo | Rama `001-schedule-productivity-mvp`; lint + tests antes del merge; preview de Vercel por PR (CORS con patrón de previews); `migrate deploy` en el build (Neon crea una rama de BD por preview) | ⚠️ | ✅ |
+| Flujo | Toda la implementación va en la rama `001-schedule-productivity-mvp` (T000); se integra a `main` solo mediante un PR (T080) con preview de Vercel de frontend y backend y merge condicionado a lint + unit + e2e en verde (T073, T081). Las migraciones: `migrate deploy` corre en cada build, pero Neon está configurado con **una rama de BD por preview** (T078), así que un PR solo migra su rama y la BD de producción se migra únicamente en el deploy de producción que dispara el merge | ✅ | ✅ |
 
-⚠️ Pre-diseño: la rama de la feature aún no existe (no hay extensión de Git). Debe crearse
-antes de `/speckit-implement`; no es una violación del diseño.
+Nota: en la primera evaluación la rama no existía (no hay extensión de Git y el trabajo previo
+se hizo en `main`). Se corrigió tras `/speckit-analyze` (hallazgos C1 y C2): la rama se creó y
+tasks.md incorpora las tareas de PR, preview, merge y la configuración de ramas de preview en
+Neon.
 
 **Resultado**: GATE superado. No hay violaciones que justificar.
 
@@ -91,7 +93,8 @@ specs/001-schedule-productivity-mvp/
 │   ├── schedule.md
 │   └── stats.md
 ├── checklists/
-│   └── requirements.md
+│   ├── requirements.md
+│   └── api-scheduler.md
 └── tasks.md             # Fase 2 (/speckit-tasks; no lo crea este comando)
 ```
 

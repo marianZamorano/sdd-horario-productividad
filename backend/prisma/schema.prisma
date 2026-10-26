@@ -1,0 +1,91 @@
+// Modelo de datos: specs/001-schedule-productivity-mvp/data-model.md
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum TaskStatus {
+  PENDING
+  DONE
+}
+
+enum BlockStatus {
+  PLANNED
+  COMPLETED
+  SKIPPED
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
+  passwordHash String
+  timezone     String   @default("UTC")
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+
+  availabilitySlots AvailabilitySlot[]
+  tasks             Task[]
+  scheduleBlocks    ScheduleBlock[]
+}
+
+model AvailabilitySlot {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @db.Uuid
+  /// 1 = lunes … 7 = domingo
+  weekday     Int
+  /// Minutos desde 00:00 locales (múltiplo de 15)
+  startMinute Int
+  endMinute   Int
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, weekday, startMinute])
+}
+
+model Task {
+  id              String     @id @default(uuid()) @db.Uuid
+  userId          String     @db.Uuid
+  title           String     @db.VarChar(120)
+  durationMinutes Int
+  priority        Priority
+  /// Fecha sin hora; se interpreta como el final de ese día en la zona del usuario
+  deadline        DateTime?  @db.Date
+  category        String?    @db.VarChar(40)
+  status          TaskStatus @default(PENDING)
+  completedAt     DateTime?  @db.Timestamptz(3)
+  createdAt       DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime   @updatedAt @db.Timestamptz(3)
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scheduleBlocks ScheduleBlock[]
+
+  @@index([userId, status])
+}
+
+model ScheduleBlock {
+  id        String      @id @default(uuid()) @db.Uuid
+  userId    String      @db.Uuid
+  taskId    String      @db.Uuid
+  startAt   DateTime    @db.Timestamptz(3)
+  endAt     DateTime    @db.Timestamptz(3)
+  status    BlockStatus @default(PLANNED)
+  createdAt DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime    @updatedAt @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startAt])
+}
