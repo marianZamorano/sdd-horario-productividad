@@ -215,7 +215,9 @@ estado real del repositorio y de los proyectos de Vercel (`vercel project inspec
 ## R12. Secretos
 
 - **Decision**: un GitHub Environment `production` con regla *Deployment branches and
-  tags* = **solo `main`**, que guarda como **environment secrets** `VERCEL_TOKEN`,
+  tags* = **solo `main`**, que guarda como **environment secrets** `VERCEL_TOKEN_API` y
+  `VERCEL_TOKEN_WEB` (tokens de proyecto: cada uno solo accede a su proyecto, así que hay
+  uno por job `deploy`),
   `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID_API`, `VERCEL_PROJECT_ID_WEB` y `PROD_DATABASE_URL`
   (URL **directa** de Neon, sin `-pooler`). No hay secretos a nivel de repositorio. Los dos
   jobs `deploy` declaran `environment: production`; ningún otro job lo hace. Las URLs

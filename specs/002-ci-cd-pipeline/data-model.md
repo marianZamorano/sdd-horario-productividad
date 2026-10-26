@@ -56,7 +56,8 @@ hay secretos de repositorio.
 
 | Nombre | Contenido | Cómo obtenerlo |
 |--------|-----------|----------------|
-| `VERCEL_TOKEN` | token de acceso de Vercel | Vercel → Account Settings → Tokens (alcance: el equipo de los proyectos) |
+| `VERCEL_TOKEN_API` | token de proyecto de Vercel (`vcp_…`) de `horario-api` | Vercel → `horario-api` → Settings → Tokens |
+| `VERCEL_TOKEN_WEB` | token de proyecto de Vercel (`vcp_…`) de `horario-web` | Vercel → `horario-web` → Settings → Tokens |
 | `VERCEL_ORG_ID` | ID del equipo (`team_…`) | `orgId` en `backend/.vercel/project.json` o Team Settings |
 | `VERCEL_PROJECT_ID_API` | ID de `horario-api` (`prj_…`) | `projectId` en `backend/.vercel/project.json` |
 | `VERCEL_PROJECT_ID_WEB` | ID de `horario-web` (`prj_…`) | `projectId` en `frontend/.vercel/project.json` |

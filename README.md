@@ -121,7 +121,8 @@ que solo admite la rama `main`; no hay secretos a nivel de repositorio. Se carga
 
 | Secreto | Cómo obtenerlo |
 |---------|----------------|
-| `VERCEL_TOKEN` | Vercel → Account Settings → Tokens, con alcance al equipo de los proyectos |
+| `VERCEL_TOKEN_API` | Token de proyecto (`vcp_…`) de `horario-api`: Vercel → `horario-api` → Settings → Tokens |
+| `VERCEL_TOKEN_WEB` | Token de proyecto (`vcp_…`) de `horario-web`: Vercel → `horario-web` → Settings → Tokens |
 | `VERCEL_ORG_ID` | `orgId` de `backend/.vercel/project.json` |
 | `VERCEL_PROJECT_ID_API` | `projectId` de `backend/.vercel/project.json` |
 | `VERCEL_PROJECT_ID_WEB` | `projectId` de `frontend/.vercel/project.json` |

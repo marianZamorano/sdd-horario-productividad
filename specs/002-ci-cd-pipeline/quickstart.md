@@ -17,14 +17,14 @@ qué comprueba cada prueba HTTP: [contracts/smoke-checks.md](contracts/smoke-che
 1. Repositorio → Settings → Environments → *New environment* → `production`.
 2. En *Deployment branches and tags*, elegir *Selected branches and tags* y añadir solo
    `main`. Sin revisores obligatorios.
-3. En *Environment secrets*, crear los cinco secretos de
+3. En *Environment secrets*, crear los seis secretos de
    [data-model.md](data-model.md#secreto-de-despliegue-github-environment-production):
-   `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID_API`, `VERCEL_PROJECT_ID_WEB` y
+   `VERCEL_TOKEN_API`, `VERCEL_TOKEN_WEB`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID_API`, `VERCEL_PROJECT_ID_WEB` y
    `PROD_DATABASE_URL`. También por CLI: `gh secret set <NOMBRE> --env production` (el
    valor por stdin).
 
 ```bash
-gh secret list --env production   # deben aparecer los cinco nombres (nunca los valores)
+gh secret list --env production   # deben aparecer los seis nombres (nunca los valores)
 gh secret list                    # no debe aparecer ninguno a nivel de repositorio
 ```
 

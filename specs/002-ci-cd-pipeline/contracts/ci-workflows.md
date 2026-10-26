@@ -132,7 +132,11 @@ secreto.
 
 | Nombre | Tipo | Lo usa |
 |--------|------|--------|
-| `VERCEL_TOKEN` | secreto de `production` | `backend / deploy`, `frontend / deploy` |
+| `VERCEL_TOKEN_API` | secreto de `production` (token del proyecto `horario-api`) | `backend / deploy` |
+| `VERCEL_TOKEN_WEB` | secreto de `production` (token del proyecto `horario-web`) | `frontend / deploy` |
+
+Los tokens de Vercel son de proyecto: cada uno solo da acceso a su proyecto. En los pasos,
+cada job expone el suyo como la variable `VERCEL_TOKEN` que usa la CLI.
 | `VERCEL_ORG_ID` | secreto de `production` | ambos `deploy` |
 | `VERCEL_PROJECT_ID_API` | secreto de `production` | `backend / deploy` |
 | `VERCEL_PROJECT_ID_WEB` | secreto de `production` | `frontend / deploy` |

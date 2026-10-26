@@ -90,12 +90,12 @@ jobs:
 
       - name: Comprobar secretos
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TOKEN_WEB: ${{ secrets.VERCEL_TOKEN_WEB }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID_WEB: ${{ secrets.VERCEL_PROJECT_ID_WEB }}
         run: |
           missing=0
-          for name in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID_WEB; do
+          for name in VERCEL_TOKEN_WEB VERCEL_ORG_ID VERCEL_PROJECT_ID_WEB; do
             if [ -z "${!name}" ]; then
               echo "::error::Falta el secreto $name"
               missing=1
@@ -108,18 +108,18 @@ jobs:
 
       - name: Descargar configuración
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_WEB }}
         run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
 
       - name: Build de Vercel
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_WEB }}
         run: vercel build --prod --token="$VERCEL_TOKEN"
 
       # Un reintento ante un fallo de la plataforma (FR-013a).
       - name: Desplegar en Vercel
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_WEB }}
         run: |
           for attempt in 1 2; do
             if url=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"); then

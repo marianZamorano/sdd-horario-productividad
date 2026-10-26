@@ -58,7 +58,7 @@ Function Node 24, `horario-web` estático), Neon Postgres.
 `main` despliega o migra; ejecuciones de `main` serializadas por paquete sin cancelar las
 que estén en curso.
 
-**Scale/Scope**: 3 workflows, 5 jobs, 5 secretos, 2 proyectos de Vercel; un repositorio y un
+**Scale/Scope**: 3 workflows, 5 jobs, 6 secretos, 2 proyectos de Vercel; un repositorio y un
 pequeño equipo que sube directo a `main`.
 
 No quedan puntos NEEDS CLARIFICATION.
