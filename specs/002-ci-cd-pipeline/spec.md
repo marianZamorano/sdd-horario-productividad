@@ -258,6 +258,14 @@ integración queda en rojo mientras los despliegues independientes siguen su cur
   exactos separada por comas; se elimina el comodín `*` que existía solo para los
   despliegues de preview (FR-016). Las peticiones sin cabecera `Origin` siguen aceptándose.
 
+**Usuario de prueba**
+
+- **FR-022**: Debe existir un usuario de prueba con email `demo@horario.app` y contraseña
+  `Demo12345`, creado por una migración de Prisma idempotente, de modo que exista en
+  cualquier base a la que se apliquen las migraciones (local, CI y producción). La migración
+  MUST NOT sobrescribir un usuario ya existente con ese email. Sus credenciales son
+  públicas y se documentan en el README; no debe usarse para datos reales.
+
 ### Key Entities
 
 - **Flujo**: ejecución de una validación (backend, frontend o integración) para un commit

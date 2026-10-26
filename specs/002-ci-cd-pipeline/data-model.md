@@ -1,7 +1,9 @@
 # Data Model: Pipeline de CI/CD
 
 **Sin cambios en el esquema de base de datos.** Esta feature no toca
-`backend/prisma/schema.prisma` ni añade migraciones. Las "entidades" de la spec son objetos
+`backend/prisma/schema.prisma`. Solo añade una migración de **datos**,
+`20261026180000_seed_demo_user`, que inserta el usuario de prueba `demo@horario.app` si no
+existe (FR-022). Las "entidades" de la spec son objetos
 de GitHub Actions y de Vercel; aquí se fija su forma y sus reglas.
 
 ## Flujo (ejecución de un workflow)
