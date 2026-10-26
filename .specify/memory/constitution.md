@@ -23,8 +23,7 @@ Sync Impact Report
   ✅ .specify/templates/spec-template.md
   ✅ .specify/templates/tasks-template.md
   ✅ AGENTS.md (no menciona PRs ni previews)
-  ⚠ README.md: la tarea pendiente "Flujo PR + preview por feature (T080–T081)" queda
-  obsoleta y debe retirarse
+  ✅ README.md: retirada la tarea obsoleta "Flujo PR + preview por feature (T080–T081)"
 - Follow-up TODOs: ninguno
 -->
 

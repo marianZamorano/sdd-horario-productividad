@@ -277,7 +277,7 @@ integración queda en rojo mientras los despliegues independientes siguen su cur
 - Se trabaja sin pull requests: los cambios se suben directamente a `main`. Por tanto la
   validación de `main` ocurre después del push, no antes de un merge. Esto choca con la
   sección "Flujo de desarrollo y quality gates" de la constitución (verde antes de cada
-  merge a `main` y un preview por PR), que deberá enmendarse con `/speckit-constitution`.
+  merge a `main` y un preview por PR), enmendada en la constitución v1.1.0.
 - Las migraciones y los cambios de la API se diseñan compatibles hacia atrás (patrón
   expand/contract), porque backend y frontend pueden quedar desplegados en commits
   distintos; quien hace el cambio es responsable de evitar cambios incompatibles.
