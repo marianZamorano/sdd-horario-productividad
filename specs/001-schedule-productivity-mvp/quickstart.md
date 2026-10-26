@@ -13,8 +13,12 @@ del modelo en [data-model.md](data-model.md).
 ## 1. Base de datos local
 
 ```bash
-docker compose up -d        # postgres:17 con las bases horario y horario_test
+docker compose up -d        # postgres:17 en localhost:5433 con las bases horario y horario_test
 ```
+
+El contenedor usa el puerto **5433** del host para no chocar con un Postgres local instalado
+en el 5432. `backend/.env` tiene prioridad sobre variables de entorno globales del sistema
+(por ejemplo, un `DATABASE_URL` de otro proyecto).
 
 ## 2. Backend
 
@@ -39,7 +43,7 @@ npm run dev                 # http://localhost:5173
 ## 4. Tests automáticos (deben pasar todos)
 
 ```bash
-cd backend && npm run lint && npm test && npm run test:e2e   # unit (scheduler, stats) + e2e supertest
+cd backend && npm run lint && npm test && npm run test:e2e   # unit (scheduler, stats) + e2e supertest (solo base horario_test)
 cd frontend && npm run lint && npm test                      # Vitest
 ```
 
@@ -54,11 +58,11 @@ resto < 25 min, generar a mitad de semana, bloques conservados).
 | 1 | Registrarse con `ana@example.com` / `secreto123` | Entra a la app con la sesión iniciada | FR-001 |
 | 2 | Añadir franjas: lunes 18:00–22:00 y sábado 09:00–13:00 | Aparecen ordenadas; "lunes 21:00–23:00" se rechaza por solape | FR-004, FR-005 |
 | 3 | Crear 5 tareas: una alta de 120 min con fecha límite, una media de 50, una baja de 30, una alta sin fecha de 90 y una con fecha límite de ayer | Lista con los minutos restantes; la de ayer aparece como vencida | FR-006, FR-007 |
-| 4 | Ir a "Semana" (la siguiente, si hoy ya pasó el lunes) y pulsar **Generar** | La vencida va primero; los bloques son de 25–50 min con 5 min entre ellos, sin solapes y dentro de las franjas; lo que no cabe aparece en "Sin asignar" | FR-010 a FR-015 |
-| 5 | Marcar 2 bloques como completados y 1 como omitido | Cambian de estado; los minutos restantes bajan solo con los completados | FR-019, FR-007 |
-| 6 | Pulsar **Generar** otra vez | Los bloques completados y omitidos siguen igual; el resto se recalcula sin solaparse con ellos | FR-016 |
+| 4 | Ir a "Semana" (la siguiente, si las franjas de esta semana ya pasaron) y pulsar **Generar horario** | La vencida va primero; los bloques son de 25–50 min con 5 min entre ellos, sin solapes y dentro de las franjas; lo que no cabe aparece en "Sin asignar" | FR-010 a FR-015 |
+| 5 | Marcar 2 bloques como completados (✓) y 1 como omitido (✕) | Cambian de estado; los minutos restantes bajan solo con los completados | FR-019, FR-007 |
+| 6 | Pulsar **Generar horario** otra vez | Los bloques completados y omitidos siguen igual; el resto se recalcula sin solaparse con ellos | FR-016 |
 | 7 | Abrir "Productividad" | % = completados / total; horas planificadas y completadas coherentes; racha ≥ 1 si se completó un bloque hoy | FR-020 a FR-022 |
-| 8 | Registrar una segunda cuenta y pedir con su token `GET /api/tasks/<id de Ana>` | `404` | FR-003 |
+| 8 | Registrar una segunda cuenta y, con su token, `PATCH` o `DELETE /api/tasks/<id de Ana>`; luego `GET /api/tasks` | `404` en ambos; la lista de la segunda cuenta no incluye tareas de Ana | FR-003 |
 | 9 | Cerrar sesión y volver a entrar | Los datos de Ana siguen ahí | FR-002 |
 
 Objetivo de tiempo (SC-001): los pasos 1 a 4 en menos de 3 minutos.
