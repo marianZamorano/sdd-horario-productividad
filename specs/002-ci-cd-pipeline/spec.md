@@ -8,6 +8,9 @@
 
 **Input**: User description: "Pipeline de CI/CD para Horario Productivo. Cada push y cada pull request deben validar automáticamente el proyecto antes de desplegar nada: instalar dependencias de backend y frontend, ejecutar lint, tests unitarios, tests e2e del backend contra un Postgres desechable, build de ambos paquetes, y una prueba de arranque que levante el backend real con su base de datos, aplique las migraciones y compruebe que GET /api/health responde {"status":"ok"} y que el frontend compilado se sirve. Si cualquier paso falla, no se despliega. Un push a main que pase todas las comprobaciones despliega a producción los dos proyectos de Vercel (horario-api y horario-web). Un pull request que pase las comprobaciones genera un deploy de preview de ambos y publica las URLs en el PR. Las migraciones de Prisma solo se aplican en el deploy de producción, nunca en previews, porque las previews comparten la base Neon de producción. Los secretos (token de Vercel e IDs de proyecto) nunca van en el repositorio. Fuera de alcance: entornos de staging, notificaciones por Slack o email, despliegue de otros servicios."
 
+> **Nota**: el Input es la descripción original. Las Clarifications de abajo la sustituyen
+> donde difieren: no hay pull requests ni despliegues de preview (FR-016).
+
 ## Clarifications
 
 ### Session 2026-10-26
@@ -27,8 +30,9 @@ ven en producción un paquete que no haya pasado sus comprobaciones.
 
 ### User Story 1 - Validación automática por paquete en cada push (Priority: P1)
 
-Cada vez que alguien hace push a cualquier rama, backend y frontend se validan solos, sin
-intervención manual, cada uno en su propio flujo y con su propio resultado:
+Cada vez que alguien hace push a cualquier rama, cada paquete modificado por ese push
+(backend o frontend, incluido su propio workflow) se valida solo, sin intervención manual,
+en su propio flujo y con su propio resultado:
 
 - **Backend**: instalar dependencias, lint, tests unitarios, tests e2e contra una base de
   datos desechable, build y prueba de arranque (backend compilado con su base de datos y
@@ -48,8 +52,9 @@ paquete y comprobar que solo ese flujo queda en rojo indicando el paso que fall�
 
 **Acceptance Scenarios**:
 
-1. **Given** una rama con código correcto, **When** se hace push, **Then** se ejecutan los
-   flujos de backend y de frontend con todas sus comprobaciones y ambos quedan "aprobado".
+1. **Given** una rama con código correcto que modifica ambos paquetes, **When** se hace
+   push, **Then** se ejecutan los flujos de backend y de frontend con todas sus
+   comprobaciones y ambos quedan "aprobado".
 2. **Given** una rama con un test unitario o e2e que falla, **When** se hace push, **Then**
    el flujo del paquete afectado queda "fallido", se identifica el paso concreto que
    falló, y el flujo del otro paquete no se ve afectado.
@@ -62,6 +67,8 @@ paquete y comprobar que solo ese flujo queda en rojo indicando el paso que fall�
    prueba de arranque, **Then** el flujo del frontend falla.
 6. **Given** un push a una rama distinta de `main`, **When** terminan los flujos, **Then**
    no se despliega nada, pasen o no.
+7. **Given** un push que no modifica un paquete (p. ej. solo documentación), **When** se
+   hace push, **Then** no se ejecuta el flujo de ese paquete.
 
 ---
 
@@ -173,7 +180,9 @@ integración queda en rojo mientras los despliegues independientes siguen su cur
 
 **Validación por paquete (CI)**
 
-- **FR-001**: La validación MUST ejecutarse automáticamente en cada push a cualquier rama.
+- **FR-001**: La validación de un paquete MUST ejecutarse automáticamente en cada push a
+  cualquier rama que modifique ese paquete (`backend/` o `frontend/`) o su workflow. Un push
+  que no modifica un paquete no ejecuta su flujo (constitución v1.2.0).
 - **FR-002**: Backend y frontend MUST validarse en flujos independientes, cada uno con su
   propio resultado; el fallo de uno no detiene ni marca como fallido al otro.
 - **FR-003**: Cada flujo MUST instalar las dependencias de su paquete de forma
@@ -210,9 +219,13 @@ integración queda en rojo mientras los despliegues independientes siguen su cur
   reintentarlo 1 vez automáticamente. Si el reintento también falla, el flujo MUST quedar
   "fallido" indicando el error, producción MUST seguir sirviendo la versión anterior de
   ese paquete, y las migraciones ya aplicadas MUST NOT revertirse.
+- **FR-013b**: Tras desplegar, el pipeline MUST comprobar el paquete en producción (backend:
+  `GET /api/health` responde `{"status":"ok"}`; frontend: la página principal responde con
+  éxito). Si la comprobación falla, el flujo MUST quedar "fallido", sin reintento ni
+  rollback automático; la versión nueva queda servida y la recuperación es manual.
 - **FR-014**: Los despliegues a producción de un mismo paquete MUST serializarse: nunca se
   ejecutan dos a la vez y, si se encolan varios, producción termina en la versión del
-  último commit de `main`.
+  último commit de `main` que modifica ese paquete.
 - **FR-015**: Los pushes a ramas distintas de `main` MUST NOT desplegar nada ni aplicar
   migraciones a ninguna base de datos compartida.
 - **FR-016**: No se generan despliegues de preview: el único entorno de despliegue es
@@ -233,8 +246,17 @@ integración queda en rojo mientras los despliegues independientes siguen su cur
 - **FR-019**: El token de Vercel, los identificadores de organización/proyecto y la cadena
   de conexión de producción MUST almacenarse como secretos del sistema de CI y MUST NOT
   aparecer en el repositorio ni en los logs.
+- **FR-019a**: Los secretos de despliegue MUST estar disponibles solo para ejecuciones de
+  `main`, de forma que modificar un workflow en otra rama no permita desplegar ni migrar
+  (la restricción no puede depender solo de una condición dentro del propio workflow).
 - **FR-020**: La documentación del repositorio MUST listar los nombres de los secretos
   necesarios y cómo obtenerlos, sin incluir sus valores.
+
+**Restos de los previews**
+
+- **FR-021**: `CORS_ORIGIN` del backend MUST interpretarse como una lista de orígenes
+  exactos separada por comas; se elimina el comodín `*` que existía solo para los
+  despliegues de preview (FR-016). Las peticiones sin cabecera `Origin` siguen aceptándose.
 
 ### Key Entities
 
@@ -250,12 +272,15 @@ integración queda en rojo mientras los despliegues independientes siguen su cur
 
 ### Measurable Outcomes
 
-- **SC-001**: El 100 % de los pushes obtienen un resultado de validación por paquete sin
-  que nadie tenga que lanzar nada a mano.
+- **SC-001**: El 100 % de los pushes que modifican un paquete obtienen un resultado de
+  validación de ese paquete sin que nadie tenga que lanzar nada a mano. Una ejecución
+  sustituida por un push más nuevo antes de empezar cuenta como resultado "cancelado".
 - **SC-002**: 0 despliegues a producción de un paquete cuyas comprobaciones estén en rojo
   en ese commit.
-- **SC-003**: Un push a `main` con un paquete en verde queda visible en producción en como
-  máximo 15 minutos desde el push, sin pasos manuales.
+- **SC-003**: En condiciones normales (ningún flujo alcanza su límite de 10 minutos), un
+  push a `main` con un paquete en verde queda visible en producción en como máximo 15
+  minutos desde que empieza su flujo, sin contar la espera en cola por FR-014 y sin pasos
+  manuales.
 - **SC-003a**: Ningún flujo se ejecuta más de 10 minutos; en condiciones normales cada
   flujo de validación termina en menos de 5 minutos.
 - **SC-004**: 0 despliegues o migraciones disparados por pushes a ramas distintas de

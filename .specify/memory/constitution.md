@@ -1,29 +1,27 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 → 1.1.0 (MINOR: guía de flujo ampliada materialmente; ningún
-  principio eliminado ni redefinido)
-- Modified principles:
-  II. Stack fijo → II. Stack fijo (añade CI/CD en GitHub Actions; los despliegues los
-  dispara solo el pipeline, sin auto-deploy por Git de Vercel)
+- Version change: 1.1.0 → 1.2.0 (MINOR: cambia materialmente el alcance de la validación
+  automática; ningún principio eliminado ni redefinido)
+- Modified principles: ninguno
 - Modified sections:
-  "Flujo de desarrollo y quality gates": se eliminan los pull requests y los despliegues
-  de preview; validación automática de cada push con flujos independientes por paquete;
-  verificación local antes de push a main; despliegue independiente por paquete solo
-  desde main; migraciones aplicadas solo por el pipeline y compatibles hacia atrás.
-  "Governance": las enmiendas se proponen con un commit (no PR) y la verificación de
-  cumplimiento la hace quien integra en main (no la revisión de PR).
+  "Flujo de desarrollo y quality gates": la validación automática aplica a cada push que
+  modifique un paquete (`backend/`, `frontend/` o su workflow); un push que no toca un
+  paquete no ejecuta su flujo (filtro de rutas por paquete, hallazgo C1 de
+  /speckit-analyze en specs/002-ci-cd-pipeline).
 - Added sections: ninguna
 - Removed sections: ninguna
+- Historial: 1.0.0 → 1.1.0 eliminó PR y previews, añadió CI/CD en GitHub Actions al stack y
+  el despliegue independiente por paquete desde main.
 - Impacto en specs en curso:
-  ✅ specs/002-ci-cd-pipeline: deja de haber conflicto (sin PR ni previews, push directo
-  a main validado por el pipeline)
-  ✅ specs/001-schedule-productivity-mvp: ya integrada con merge directo; sin cambios
+  ✅ specs/002-ci-cd-pipeline: FR-001, SC-001 y la US1 dicen "cada push que modifique el
+  paquete"; plan, research y tasks actualizados
+  ✅ specs/001-schedule-productivity-mvp: integrada; sin cambios
 - Templates y guías revisados (sin cambios necesarios):
   ✅ .specify/templates/plan-template.md (Constitution Check lee la constitución)
   ✅ .specify/templates/spec-template.md
   ✅ .specify/templates/tasks-template.md
-  ✅ AGENTS.md (no menciona PRs ni previews)
-  ✅ README.md: retirada la tarea obsoleta "Flujo PR + preview por feature (T080–T081)"
+  ✅ AGENTS.md (no menciona el alcance de la validación)
+  ✅ README.md: sección Estado actualizada a "Constitución v1.2.0"
 - Follow-up TODOs: ninguno
 -->
 
@@ -127,10 +125,11 @@ evitan las fugas más comunes.
 - Una rama por feature, con el nombre que genera Spec Kit (`NNN-nombre-feature`).
 - No se usan pull requests ni despliegues de preview: el único entorno de despliegue es
   producción.
-- Cada push a cualquier rama MUST validarse automáticamente en el pipeline de CI, con un
+- Cada push a cualquier rama que modifique un paquete (`backend/` o `frontend/`, o el
+  workflow de ese paquete) MUST validarse automáticamente en el pipeline de CI, con un
   flujo independiente para backend y otro para frontend (dependencias, lint, tests
   unitarios, tests e2e del backend contra una base desechable, build y prueba de
-  arranque).
+  arranque). Un push que no modifica un paquete no ejecuta el flujo de ese paquete.
 - Los cambios se integran en `main` directamente (push o merge local, sin PR). Antes de
   hacer push a `main`, quien desarrolla MUST ejecutar en local lint y tests de los
   paquetes afectados.
@@ -159,4 +158,4 @@ evitan las fugas más comunes.
   CRITICAL. Quien integra un cambio en `main` verifica estos principios.
 - La guía operativa para agentes de IA está en `AGENTS.md`.
 
-**Version**: 1.1.0 | **Ratified**: 2026-10-26 | **Last Amended**: 2026-10-26
+**Version**: 1.2.0 | **Ratified**: 2026-10-26 | **Last Amended**: 2026-10-26
