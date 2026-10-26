@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router';
+import { useAuth } from '../auth/useAuth';
 
 const links = [
   { to: '/week', label: 'Semana' },
@@ -8,6 +9,8 @@ const links = [
 ];
 
 export function Layout() {
+  const { user, logout } = useAuth();
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
@@ -24,6 +27,16 @@ export function Layout() {
               {link.label}
             </NavLink>
           ))}
+          <div className="ml-auto flex items-center gap-3 text-sm">
+            <span className="text-slate-500">{user?.email}</span>
+            <button
+              type="button"
+              onClick={logout}
+              className="rounded border border-slate-300 px-2 py-1 text-slate-700 hover:bg-slate-100"
+            >
+              Cerrar sesión
+            </button>
+          </div>
         </nav>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6">

@@ -80,16 +80,16 @@ implementar.
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T021 [P] [US1] E2E tests for contracts/auth.md in `backend/test/auth.e2e-spec.ts`: register 201 (email normalized to lowercase, no `passwordHash` in the body), duplicate email 409 `EMAIL_TAKEN`, invalid email/short password 400, unknown field 400, login 200, wrong password and unknown email → same 401 message, `GET /me` with and without a token
-- [ ] T022 [P] [US1] Component tests for login/register forms (validation messages in Spanish, submits, shows API error) in `frontend/src/pages/auth.test.tsx`
+- [X] T021 [P] [US1] E2E tests for contracts/auth.md in `backend/test/auth.e2e-spec.ts`: register 201 (email normalized to lowercase, no `passwordHash` in the body), duplicate email 409 `EMAIL_TAKEN`, invalid email/short password 400, unknown field 400, login 200, wrong password and unknown email → same 401 message, `GET /me` with and without a token
+- [X] T022 [P] [US1] Component tests for login/register forms (validation messages in Spanish, submits, shows API error) in `frontend/src/pages/auth.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T023 [P] [US1] Create DTOs `RegisterDto` (email, password 8–72, optional IANA timezone validated with Luxon) and `LoginDto` in `backend/src/auth/dto/register.dto.ts` and `backend/src/auth/dto/login.dto.ts`
-- [ ] T024 [US1] Implement `AuthService` (bcrypt cost 10, unique email → `EMAIL_TAKEN`, JWT `sub=userId` with 7-day expiry, `toUserDto` without hash) in `backend/src/auth/auth.service.ts`
-- [ ] T025 [US1] Implement `AuthController` (`POST register` and `POST login` as `@Public()`, `GET me`) and `AuthModule` registering `JwtModule` in `backend/src/auth/auth.controller.ts` and `backend/src/auth/auth.module.ts`; run T021 until green
-- [ ] T026 [P] [US1] Implement session context (token + user in `localStorage`, `login`, `register` sending `Intl` timezone, `logout`) and `ProtectedRoute` in `frontend/src/auth/AuthContext.tsx` and `frontend/src/auth/ProtectedRoute.tsx`
-- [ ] T027 [US1] Build `LoginPage` and `RegisterPage` (Spanish UI, inline errors, redirect to `/tasks` on success) in `frontend/src/pages/LoginPage.tsx` and `frontend/src/pages/RegisterPage.tsx`, add a logout button to `Layout.tsx`; run T022 until green
+- [X] T023 [P] [US1] Create DTOs `RegisterDto` (email, password 8–72, optional IANA timezone validated with Luxon) and `LoginDto` in `backend/src/auth/dto/register.dto.ts` and `backend/src/auth/dto/login.dto.ts`
+- [X] T024 [US1] Implement `AuthService` (bcrypt cost 10, unique email → `EMAIL_TAKEN`, JWT `sub=userId` with 7-day expiry, `toUserDto` without hash) in `backend/src/auth/auth.service.ts`
+- [X] T025 [US1] Implement `AuthController` (`POST register` and `POST login` as `@Public()`, `GET me`) and `AuthModule` registering `JwtModule` in `backend/src/auth/auth.controller.ts` and `backend/src/auth/auth.module.ts`; run T021 until green
+- [X] T026 [P] [US1] Implement session context (token + user in `localStorage`, `login`, `register` sending `Intl` timezone, `logout`) and `ProtectedRoute` in `frontend/src/auth/AuthContext.tsx` and `frontend/src/auth/ProtectedRoute.tsx`
+- [X] T027 [US1] Build `LoginPage` and `RegisterPage` (Spanish UI, inline errors, redirect to `/tasks` on success) in `frontend/src/pages/LoginPage.tsx` and `frontend/src/pages/RegisterPage.tsx`, add a logout button to `Layout.tsx`; run T022 until green
 
 **Checkpoint**: US1 funcional y testeada de forma independiente.
 
@@ -103,16 +103,16 @@ implementar.
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T028 [P] [US2] E2E tests for contracts/availability.md in `backend/test/availability.e2e-spec.ts`: create 201, list ordered by weekday/startMinute, `end <= start` 400, non-multiple of 15 400, overlap 409 `SLOT_OVERLAP`, PATCH that excludes itself from the overlap check, DELETE 204, 401 without a token, user B's PATCH/DELETE on A's slot → 404
-- [ ] T029 [P] [US2] Component test for the slot form and list (HH:mm ↔ minutes conversion, shows the overlap error) in `frontend/src/pages/AvailabilityPage.test.tsx`
+- [X] T028 [P] [US2] E2E tests for contracts/availability.md in `backend/test/availability.e2e-spec.ts`: create 201, list ordered by weekday/startMinute, `end <= start` 400, non-multiple of 15 400, overlap 409 `SLOT_OVERLAP`, PATCH that excludes itself from the overlap check, DELETE 204, 401 without a token, user B's PATCH/DELETE on A's slot → 404
+- [X] T029 [P] [US2] Component test for the slot form and list (HH:mm ↔ minutes conversion, shows the overlap error) in `frontend/src/pages/AvailabilityPage.test.tsx`
 
 ### Implementation for User Story 2
 
-- [ ] T030 [P] [US2] Create `CreateSlotDto` and `UpdateSlotDto` (weekday 1–7, minutes multiple of 15, cross-field `endMinute > startMinute`) in `backend/src/availability/dto/`
-- [ ] T031 [US2] Implement `AvailabilityService` (all queries scoped by `userId`, overlap check `a.start < b.end && b.start < a.end`, 404 when not owned) in `backend/src/availability/availability.service.ts`
-- [ ] T032 [US2] Implement `AvailabilityController` and `AvailabilityModule` in `backend/src/availability/availability.controller.ts` and `backend/src/availability/availability.module.ts`; run T028 until green
-- [ ] T033 [P] [US2] Add availability API hooks (`useSlots`, `useCreateSlot`, `useUpdateSlot`, `useDeleteSlot`) in `frontend/src/api/availability.ts`
-- [ ] T034 [US2] Build `AvailabilityPage` (slots grouped by day, `SlotForm` with day selector and 15-min time inputs, edit/delete) in `frontend/src/pages/AvailabilityPage.tsx` and `frontend/src/components/SlotForm.tsx`; run T029 until green
+- [X] T030 [P] [US2] Create `CreateSlotDto` and `UpdateSlotDto` (weekday 1–7, minutes multiple of 15, cross-field `endMinute > startMinute`) in `backend/src/availability/dto/`
+- [X] T031 [US2] Implement `AvailabilityService` (all queries scoped by `userId`, overlap check `a.start < b.end && b.start < a.end`, 404 when not owned) in `backend/src/availability/availability.service.ts`
+- [X] T032 [US2] Implement `AvailabilityController` and `AvailabilityModule` in `backend/src/availability/availability.controller.ts` and `backend/src/availability/availability.module.ts`; run T028 until green
+- [X] T033 [P] [US2] Add availability API hooks (`useSlots`, `useCreateSlot`, `useUpdateSlot`, `useDeleteSlot`) in `frontend/src/api/availability.ts`
+- [X] T034 [US2] Build `AvailabilityPage` (slots grouped by day, `SlotForm` with day selector and 15-min time inputs, edit/delete) in `frontend/src/pages/AvailabilityPage.tsx` and `frontend/src/components/SlotForm.tsx`; run T029 until green
 
 **Checkpoint**: US1 y US2 funcionan de forma independiente.
 

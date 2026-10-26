@@ -7,7 +7,8 @@ export default function globalSetup(): void {
   useTestDatabase();
   execSync('npx prisma migrate deploy', {
     stdio: 'ignore',
-    env: process.env,
+    // Evita que prisma.config.ts recargue .env y apunte a la base de desarrollo.
+    env: { ...process.env, PRISMA_SKIP_DOTENV: '1' },
     cwd: `${__dirname}/..`,
   });
 }
