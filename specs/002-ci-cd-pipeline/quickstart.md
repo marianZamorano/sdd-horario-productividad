@@ -44,9 +44,12 @@ comodín ya no se interpreta.
 2. Neon (Vercel → Storage → `horario-db` → configuración de la integración): desactivar la
    creación de una **rama de base de datos por cada deploy de preview**, y borrar en Neon las
    ramas de preview que queden.
-3. Vercel → cada proyecto → Settings → Git: si el repositorio está conectado, puede quedarse
-   así (`deploymentEnabled: false` impide los despliegues automáticos); si no lo está, no hay
-   que hacer nada.
+3. **Desconectar la integración Git** de los dos proyectos: `vercel git disconnect --yes` en
+   `backend/` y en `frontend/` (o Vercel → proyecto → Settings → Git → Disconnect). Es
+   obligatorio: con Root Directory `.`, Vercel busca `git.deploymentEnabled` en un
+   `vercel.json` de la raíz del repo, que no existe, así que la opción de `backend/` y
+   `frontend/` no frena los despliegues por Git. Si se dejan conectados, cada push crea un
+   despliegue de la raíz (vacío) que puede pisar en producción el del pipeline.
 
 ## 2. Escenarios de validación
 

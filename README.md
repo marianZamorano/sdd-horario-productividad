@@ -339,8 +339,10 @@ Detalle en [specs/002-ci-cd-pipeline/contracts/ci-workflows.md](specs/002-ci-cd-
   desde `frontend/` y `backend/`.
 - Neon Postgres (`horario-db`) instalado desde Vercel Marketplace y conectado **solo** al
   entorno Production de `horario-api`.
-- **Solo despliega el pipeline** desde `main`; el auto-deploy por Git de Vercel está
-  desactivado.
+- **Solo despliega el pipeline** desde `main`. Los proyectos de Vercel **no están
+  conectados a Git** (`vercel git disconnect`): con Root Directory `.`, una conexión Git
+  despliega la raíz del repo, que está vacía, y pisaría la versión buena. No vuelvas a
+  conectarlos.
 - Las migraciones las aplica el job `backend / deploy` con `prisma migrate deploy` antes de
   desplegar; el build de Vercel ya no migra.
 

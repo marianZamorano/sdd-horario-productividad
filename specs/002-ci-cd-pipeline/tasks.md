@@ -137,6 +137,7 @@ escribe primero) porque cambia el comportamiento de `cors.ts`.
 - [X] T024 Auditoría de secretos ([quickstart.md](quickstart.md) §Secretos y logs): `git log -p` sin coincidencias de `neon.tech`, `prj_`, `team_` ni tokens, y en los logs de la última ejecución de `backend / deploy` y `frontend / deploy` (`gh run view --log`) los secretos aparecen como `***` y no hay volcado de `.vercel/.env.production.local` (FR-019, SC-005)
 - [ ] T025 Marcar como completada la línea "CI/CD" de la sección "Estado" de `README.md` (pipeline implementado, enlace a `specs/002-ci-cd-pipeline/`), integrar en `main` y comprobar que el push final deja en verde `backend`, `frontend` e `integration` y que la app de producción funciona de punta a punta (login → semana) con el CORS de orígenes exactos
 - [X] T026 Crear el usuario de prueba `demo@horario.app` / `Demo12345` con una migración idempotente en `backend/prisma/migrations/20261026180000_seed_demo_user/migration.sql` (INSERT con hash bcrypt coste 10 y ON CONFLICT DO NOTHING), aplicarla en local y documentar las credenciales en `README.md` (FR-022)
+- [X] T027 Desconectar la integración Git de Vercel en `horario-api` y `horario-web` (`vercel git disconnect`): con Root Directory `.` el `git.deploymentEnabled` de los `vercel.json` de cada paquete no se aplica y los despliegues por Git de la raíz vacía pisaban producción (`horario-web` en 404). Restaurar el frontend relanzando su job `deploy` y documentarlo en README, research R11 y quickstart §1.3 (constitución II, FR-016)
 
 ---
 

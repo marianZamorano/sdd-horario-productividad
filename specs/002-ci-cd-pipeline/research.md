@@ -211,6 +211,13 @@ estado real del repositorio y de los proyectos de Vercel (`vercel project inspec
   (constitución, "Flujo"; FR-013).
 - **Alternatives considered**: "Ignored Build Step" en el dashboard (configuración fuera del
   repo, no versionada); desconectar Git solo en el dashboard (ídem).
+- **Corrección tras la implementación**: `deploymentEnabled: false` **no bastó**. Los
+  proyectos tienen Root Directory `.`, así que la integración Git lee el `vercel.json` de la
+  raíz del repo (no existe) y siguió desplegando en cada push. Esos despliegues construían
+  la raíz (vacía) y uno dejó `horario-web` en 404 al pisar al del pipeline. Se resolvió
+  **desconectando la integración Git** de ambos proyectos (`vercel git disconnect`); la
+  opción de los `vercel.json` se mantiene como segunda barrera si alguien los reconecta con
+  el Root Directory de su paquete.
 
 ## R12. Secretos
 
