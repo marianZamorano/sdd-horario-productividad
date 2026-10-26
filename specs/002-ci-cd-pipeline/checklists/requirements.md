@@ -36,7 +36,16 @@
   existente sobre el que se actúa (constitución, principio II), no decisiones de diseño.
   El "cómo" (GitHub Actions, comandos de Vercel CLI, servicio Postgres del runner) queda
   para `plan.md`.
-- Decisiones tomadas por defecto sin marcar clarificación (documentadas en Assumptions /
-  Edge Cases): PRs de forks omiten el preview; el despliegue se hace solo desde el
-  pipeline (se desactiva el auto-deploy de Vercel por Git); backend antes que frontend;
-  despliegues de producción serializados; sin rollback automático.
+- Decisiones de la clarificación (sesión 2026-10-26, ver `## Clarifications` en la spec):
+  - No se usan pull requests ni despliegues de preview: se sube directamente a `main`, y
+    solo `main` despliega a producción; las demás ramas solo se validan.
+  - Backend y frontend se validan y despliegan por separado: un paquete en verde se
+    despliega aunque el otro falle.
+  - Un flujo de integración (backend + frontend juntos) se ejecuta en cada push a `main`;
+    es informativo y no bloquea los despliegues.
+  - Límite de 15 minutos en total desde el push hasta producción y de 10 minutos por flujo.
+  - Si el deploy de Vercel falla tras pasar los tests, se reintenta 1 vez; si vuelve a
+    fallar, el flujo queda en rojo y las migraciones ya aplicadas no se revierten.
+- Decisiones tomadas por defecto (documentadas en Assumptions / Edge Cases): el despliegue
+  se hace solo desde el pipeline (se desactiva el auto-deploy de Vercel por Git);
+  despliegues de producción de un mismo paquete serializados; sin rollback automático.

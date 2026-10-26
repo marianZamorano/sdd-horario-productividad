@@ -134,5 +134,6 @@ Tests: `npm test` en `backend/` y `frontend/`; e2e del backend con `npm run test
 - [x] Implementación del MVP: cuenta, disponibilidad, tareas, generador de horario, vista
   semanal, seguimiento de bloques y panel de productividad (T000–T075)
 - [x] Deploy en Vercel con Neon Postgres y flujo completo verificado en producción
-- [ ] Flujo PR + preview por feature (T080–T081): esta primera entrega se integró a `main`
-  con merge directo
+- [ ] CI/CD: el flujo PR + preview (T080–T081) se descartó en la constitución v1.1.0; el
+  pipeline se define en [specs/002-ci-cd-pipeline](specs/002-ci-cd-pipeline/) (pendiente
+  de implementar)
