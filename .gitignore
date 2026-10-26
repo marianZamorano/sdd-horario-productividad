@@ -19,3 +19,6 @@ coverage/
 .DS_Store
 Thumbs.db
 *.log
+
+# Capturas de pruebas en navegador (Playwright MCP)
+.playwright-mcp/
