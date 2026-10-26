@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { assertValidId, orNotFound } from '../common/find-owned';
 import { weekRange } from '../common/time';
 import type { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { toIsoDate } from '../tasks/tasks.service';
+import { TasksService, toIsoDate, type TaskDto } from '../tasks/tasks.service';
 import { isOverdue, type Priority } from '../tasks/task-rules';
+import { nextTaskStatus } from './block-rules';
 import { generateSchedule } from './scheduler';
 import type { UnassignedReason } from './scheduler.types';
 
@@ -51,7 +53,64 @@ type Tx = Prisma.TransactionClient;
 
 @Injectable()
 export class ScheduleService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly tasks: TasksService,
+  ) {}
+
+  /** FR-019 + FR-008: cambia el estado del bloque y recalcula el estado de su tarea. */
+  async updateBlockStatus(
+    userId: string,
+    blockId: string,
+    status: BlockStatus,
+  ): Promise<{ block: ScheduleBlockDto; task: TaskDto }> {
+    assertValidId(blockId);
+    const timezone = await this.timezoneOf(userId);
+    const now = new Date();
+
+    return this.prisma.$transaction(async (tx) => {
+      const current = orNotFound(
+        await tx.scheduleBlock.findFirst({ where: { id: blockId, userId } }),
+      );
+      await tx.scheduleBlock.update({
+        where: { id: blockId },
+        data: { status },
+      });
+
+      const completed = await tx.scheduleBlock.findMany({
+        where: { taskId: current.taskId, status: 'COMPLETED' },
+        select: { startAt: true, endAt: true },
+      });
+      const completedMinutes = completed.reduce(
+        (sum, b) => sum + minutesBetween(b.startAt, b.endAt),
+        0,
+      );
+
+      const task = await tx.task.findUniqueOrThrow({
+        where: { id: current.taskId },
+      });
+      const next = nextTaskStatus({
+        task,
+        completedMinutes,
+        blockLeftCompleted:
+          current.status === 'COMPLETED' && status !== 'COMPLETED',
+        now,
+      });
+      const updatedTask = await tx.task.update({
+        where: { id: task.id },
+        data: next,
+      });
+
+      const block = await tx.scheduleBlock.findUniqueOrThrow({
+        where: { id: blockId },
+        include: { task: true },
+      });
+      return {
+        block: this.toBlockDto(block, timezone, now),
+        task: this.tasks.toDto(updatedTask, completedMinutes, now, timezone),
+      };
+    });
+  }
 
   async getWeek(userId: string, weekStart: string): Promise<WeekScheduleDto> {
     const timezone = await this.timezoneOf(userId);

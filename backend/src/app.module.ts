@@ -8,6 +8,7 @@ import { JwtAuthGuard } from './common/jwt-auth.guard';
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ScheduleModule } from './schedule/schedule.module';
+import { StatsModule } from './stats/stats.module';
 import { TasksModule } from './tasks/tasks.module';
 
 @Module({
@@ -27,6 +28,7 @@ import { TasksModule } from './tasks/tasks.module';
     AvailabilityModule,
     TasksModule,
     ScheduleModule,
+    StatsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })

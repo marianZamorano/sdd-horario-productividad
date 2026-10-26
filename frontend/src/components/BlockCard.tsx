@@ -29,12 +29,14 @@ export function BlockCard({ block, startMinutes, style, actions }: BlockCardProp
     <article
       style={style}
       title={`${block.taskTitle} · ${time}`}
-      className={`overflow-hidden rounded border px-1.5 py-0.5 text-xs leading-4 shadow-sm ${STATUS_STYLES[block.status]} ${block.overdue ? 'border-l-4 border-l-rose-500' : ''}`}
+      className={`rounded border px-1.5 py-0.5 text-xs leading-4 shadow-sm ${STATUS_STYLES[block.status]} ${block.overdue ? 'border-l-4 border-l-rose-500' : ''}`}
     >
-      <p className={`truncate font-medium ${block.status === 'SKIPPED' ? 'line-through' : ''}`}>
+      <p
+        className={`truncate font-medium ${actions ? 'pr-11' : ''} ${block.status === 'SKIPPED' ? 'line-through' : ''}`}
+      >
         {block.taskTitle}
       </p>
-      <p className="flex flex-wrap items-center gap-x-1 text-slate-600">
+      <p className="flex items-center gap-x-1 overflow-hidden whitespace-nowrap text-slate-600">
         <span>{time}</span>
         {statusLabel && <span className="font-medium text-slate-800">{statusLabel}</span>}
         {block.overdue && (

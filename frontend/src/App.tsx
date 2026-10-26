@@ -4,8 +4,8 @@ import { ProtectedRoute } from './auth/ProtectedRoute';
 import { Layout } from './components/Layout';
 import { AvailabilityPage } from './pages/AvailabilityPage';
 import { LoginPage } from './pages/LoginPage';
-import { Placeholder } from './pages/Placeholder';
 import { RegisterPage } from './pages/RegisterPage';
+import { StatsPage } from './pages/StatsPage';
 import { TasksPage } from './pages/TasksPage';
 import { WeekPage } from './pages/WeekPage';
 
@@ -22,7 +22,7 @@ const router = createBrowserRouter([
           { path: '/week', element: <WeekPage /> },
           { path: '/tasks', element: <TasksPage /> },
           { path: '/availability', element: <AvailabilityPage /> },
-          { path: '/stats', element: <Placeholder title="Productividad" /> },
+          { path: '/stats', element: <StatsPage /> },
         ],
       },
     ],

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ApiError } from '../api/client';
 import { useGenerate, useWeek } from '../api/schedule';
 import type { GenerateResultDto } from '../api/types';
+import { BlockStatusActions } from '../components/BlockStatusActions';
 import { UnassignedPanel } from '../components/UnassignedPanel';
 import { WeekGrid } from '../components/WeekGrid';
 import { addWeeks, mondayOf } from '../lib/dates';
@@ -86,7 +87,12 @@ export function WeekPage() {
       {isLoading ? (
         <p className="text-slate-500">Cargando…</p>
       ) : (
-        <WeekGrid weekStart={weekStart} timezone={timezone} blocks={data?.blocks ?? []} />
+        <WeekGrid
+          weekStart={weekStart}
+          timezone={timezone}
+          blocks={data?.blocks ?? []}
+          renderActions={(block) => <BlockStatusActions block={block} weekStart={weekStart} />}
+        />
       )}
 
       {result && <UnassignedPanel items={result.unassigned} />}

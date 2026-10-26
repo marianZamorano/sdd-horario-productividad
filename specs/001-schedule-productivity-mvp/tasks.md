@@ -179,16 +179,16 @@ implementar.
 
 ### Tests for User Story 5 ⚠️
 
-- [ ] T056 [P] [US5] Unit tests first for `nextTaskStatus(task, completedMinutes)` (auto DONE when Σ ≥ duration; reopen when a block leaves COMPLETED and Σ < duration) in `backend/src/schedule/block-rules.spec.ts`
-- [ ] T057 [P] [US5] E2E tests for `PATCH /api/schedule/blocks/:id` (contracts/schedule.md) in `backend/test/blocks.e2e-spec.ts`: every status transition, response `{ block, task }` with updated `remainingMinutes`, auto-complete and reopen, invalid status 400, 401, user B → 404
-- [ ] T058 [P] [US5] Component test for block status actions in `BlockCard` (completar / omitir / deshacer, optimistic update and rollback on error) in `frontend/src/components/BlockCard.test.tsx`
+- [X] T056 [P] [US5] Unit tests first for `nextTaskStatus(task, completedMinutes)` (auto DONE when Σ ≥ duration; reopen when a block leaves COMPLETED and Σ < duration) in `backend/src/schedule/block-rules.spec.ts`
+- [X] T057 [P] [US5] E2E tests for `PATCH /api/schedule/blocks/:id` (contracts/schedule.md) in `backend/test/blocks.e2e-spec.ts`: every status transition, response `{ block, task }` with updated `remainingMinutes`, auto-complete and reopen, invalid status 400, 401, user B → 404
+- [X] T058 [P] [US5] Component test for block status actions in `BlockCard` (completar / omitir / deshacer, optimistic update and rollback on error) in `frontend/src/components/BlockCard.test.tsx`
 
 ### Implementation for User Story 5
 
-- [ ] T059 [US5] Implement `nextTaskStatus` in `backend/src/schedule/block-rules.ts`; run T056 until green
-- [ ] T060 [P] [US5] Create `UpdateBlockStatusDto` in `backend/src/schedule/dto/update-block-status.dto.ts`
-- [ ] T061 [US5] Implement `ScheduleService.updateBlockStatus()` (transaction: update the block, recompute completed minutes, apply `nextTaskStatus`, set/clear `completedAt`) and the `PATCH /schedule/blocks/:id` route in `backend/src/schedule/schedule.service.ts` and `backend/src/schedule/schedule.controller.ts`; run T057 until green
-- [ ] T062 [US5] Add `useUpdateBlockStatus` (invalidates `week`, `tasks` and `stats` queries) in `frontend/src/api/schedule.ts` and status action buttons with state colors in `frontend/src/components/BlockCard.tsx`; run T058 until green
+- [X] T059 [US5] Implement `nextTaskStatus` in `backend/src/schedule/block-rules.ts`; run T056 until green
+- [X] T060 [P] [US5] Create `UpdateBlockStatusDto` in `backend/src/schedule/dto/update-block-status.dto.ts`
+- [X] T061 [US5] Implement `ScheduleService.updateBlockStatus()` (transaction: update the block, recompute completed minutes, apply `nextTaskStatus`, set/clear `completedAt`) and the `PATCH /schedule/blocks/:id` route in `backend/src/schedule/schedule.service.ts` and `backend/src/schedule/schedule.controller.ts`; run T057 until green
+- [X] T062 [US5] Add `useUpdateBlockStatus` (invalidates `week`, `tasks` and `stats` queries) in `frontend/src/api/schedule.ts` and status action buttons with state colors in `frontend/src/components/BlockCard.tsx`; run T058 until green
 
 **Checkpoint**: US1–US5 funcionan; el seguimiento produce datos para las métricas.
 
@@ -202,16 +202,16 @@ implementar.
 
 ### Tests for User Story 6 ⚠️
 
-- [ ] T063 [P] [US6] Unit tests first for `computeWeekStats()` in `backend/src/stats/stats.spec.ts`: US6 scenarios 1–4 (60 %, 8 h / 5 h, streak 3, empty week → zeros), streak counted from yesterday when today has none, streak broken by a gap, skipped blocks count in total but not completed, rounding to an integer, local-date boundaries in a non-UTC timezone
-- [ ] T064 [P] [US6] E2E tests for `GET /api/stats/week` (contracts/stats.md) in `backend/test/stats.e2e-spec.ts`: values with seeded blocks/tasks, `tasksCompleted` uses `completedAt` within the week, `weekStart` not a Monday 400, 401, user B's stats ignore A's data
-- [ ] T065 [P] [US6] Component test for `StatsPage` (four stat cards, hours formatting, empty-week message) in `frontend/src/pages/StatsPage.test.tsx`
+- [X] T063 [P] [US6] Unit tests first for `computeWeekStats()` in `backend/src/stats/stats.spec.ts`: US6 scenarios 1–4 (60 %, 8 h / 5 h, streak 3, empty week → zeros), streak counted from yesterday when today has none, streak broken by a gap, skipped blocks count in total but not completed, rounding to an integer, local-date boundaries in a non-UTC timezone
+- [X] T064 [P] [US6] E2E tests for `GET /api/stats/week` (contracts/stats.md) in `backend/test/stats.e2e-spec.ts`: values with seeded blocks/tasks, `tasksCompleted` uses `completedAt` within the week, `weekStart` not a Monday 400, 401, user B's stats ignore A's data
+- [X] T065 [P] [US6] Component test for `StatsPage` (four stat cards, hours formatting, empty-week message) in `frontend/src/pages/StatsPage.test.tsx`
 
 ### Implementation for User Story 6
 
-- [ ] T066 [US6] Implement `computeWeekStats()` as a pure function in `backend/src/stats/stats.ts`; run T063 until green
-- [ ] T067 [US6] Implement `StatsService` (load the week's blocks, all COMPLETED block starts, tasks completed in the week, call `computeWeekStats(now, user.timezone)`), `StatsController` and `StatsModule` in `backend/src/stats/`; run T064 until green
-- [ ] T068 [P] [US6] Add `useWeekStats(weekStart)` in `frontend/src/api/stats.ts`
-- [ ] T069 [US6] Build `StatsPage` with `StatCard` components and the week selector in `frontend/src/pages/StatsPage.tsx` and `frontend/src/components/StatCard.tsx`; run T065 until green
+- [X] T066 [US6] Implement `computeWeekStats()` as a pure function in `backend/src/stats/stats.ts`; run T063 until green
+- [X] T067 [US6] Implement `StatsService` (load the week's blocks, all COMPLETED block starts, tasks completed in the week, call `computeWeekStats(now, user.timezone)`), `StatsController` and `StatsModule` in `backend/src/stats/`; run T064 until green
+- [X] T068 [P] [US6] Add `useWeekStats(weekStart)` in `frontend/src/api/stats.ts`
+- [X] T069 [US6] Build `StatsPage` with `StatCard` components and the week selector in `frontend/src/pages/StatsPage.tsx` and `frontend/src/components/StatCard.tsx`; run T065 until green
 
 **Checkpoint**: todas las historias funcionan de forma independiente.
 
@@ -221,12 +221,12 @@ implementar.
 
 **Purpose**: calidad transversal antes del despliegue.
 
-- [ ] T070 [P] Add loading, error and empty states to every page and a global API error toast in `frontend/src/components/` and the pages in `frontend/src/pages/`
-- [ ] T071 [P] Responsive pass for mobile widths (week grid scrolls horizontally per day, forms stack) in `frontend/src/components/WeekGrid.tsx` and `frontend/src/index.css`
-- [ ] T072 [P] Ensure the API never logs or returns `passwordHash` or tokens, and add a request-size limit and `helmet`-style headers if needed in `backend/src/main.ts`
-- [ ] T073 Run `npm run lint`, `npm test` and `npm run test:e2e` in `backend/` and `npm run lint` and `npm test` in `frontend/`; fix every failure
-- [ ] T074 Execute the manual walkthrough of `specs/001-schedule-productivity-mvp/quickstart.md` §5 locally (steps 1–9) and fix any issues found
-- [ ] T075 [P] Update the "Estado" section and run instructions of `README.md`
+- [X] T070 [P] Add loading, error and empty states to every page and a global API error toast in `frontend/src/components/` and the pages in `frontend/src/pages/`
+- [X] T071 [P] Responsive pass for mobile widths (week grid scrolls horizontally per day, forms stack) in `frontend/src/components/WeekGrid.tsx` and `frontend/src/index.css`
+- [X] T072 [P] Ensure the API never logs or returns `passwordHash` or tokens, and add a request-size limit and `helmet`-style headers if needed in `backend/src/main.ts`
+- [X] T073 Run `npm run lint`, `npm test` and `npm run test:e2e` in `backend/` and `npm run lint` and `npm test` in `frontend/`; fix every failure
+- [X] T074 Execute the manual walkthrough of `specs/001-schedule-productivity-mvp/quickstart.md` §5 locally (steps 1–9) and fix any issues found
+- [X] T075 [P] Update the "Estado" section and run instructions of `README.md`
 
 ---
 

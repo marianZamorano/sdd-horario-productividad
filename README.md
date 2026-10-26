@@ -86,10 +86,40 @@ Este repo ya está inicializado con
 volver a ejecutarlo. Abre la carpeta en VS Code con Claude Code y sigue
 [docs/prompts.md](docs/prompts.md) desde el paso 1.
 
+## Ejecutar el MVP en local
+Requisitos: Node 20.19+ (recomendado 24 LTS) y Docker Desktop.
+
+```bash
+# Postgres 17 en el puerto 5433 (bases horario y horario_test)
+docker compose up -d
+
+# Backend: http://localhost:3000/api
+cd backend
+cp .env.example .env
+npm install
+npx prisma migrate dev
+npm run start:dev
+
+# Frontend: http://localhost:5173 (en otra terminal)
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+```
+
+Tests: `npm test` en `backend/` y `frontend/`; e2e del backend con `npm run test:e2e`
+(usan solo la base `horario_test`). Guía de validación completa:
+[specs/001-schedule-productivity-mvp/quickstart.md](specs/001-schedule-productivity-mvp/quickstart.md).
+
+> En local, `backend/.env` tiene prioridad sobre variables de entorno globales del sistema
+> (por ejemplo, un `DATABASE_URL` de otro proyecto).
+
 ## Estado
 - [x] Repositorio SDD inicializado con Spec Kit (integración Claude, scripts PowerShell)
 - [x] Visión de producto, arquitectura y diagrama
-- [ ] Constitución (`/speckit-constitution`)
-- [ ] Spec, plan y tareas del MVP
-- [ ] Implementación del MVP
-- [ ] Deploy en Vercel
+- [x] Constitución v1.0.0 (`/speckit-constitution`)
+- [x] Spec, clarificación, plan, checklist, tareas y análisis del MVP
+  ([specs/001-schedule-productivity-mvp](specs/001-schedule-productivity-mvp/))
+- [x] Implementación del MVP: cuenta, disponibilidad, tareas, generador de horario, vista
+  semanal, seguimiento de bloques y panel de productividad (T000–T075)
+- [ ] PR a `main` con preview y deploy en Vercel (T076–T083)
