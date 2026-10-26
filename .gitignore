@@ -1,0 +1,21 @@
+# Dependencias y builds
+node_modules/
+dist/
+build/
+coverage/
+
+# Entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel/
+
+# Configuración local del agente (puede contener datos personales)
+.claude/settings.local.json
+
+# SO / editores
+.DS_Store
+Thumbs.db
+*.log
