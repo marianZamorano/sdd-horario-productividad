@@ -1,0 +1,6 @@
+node_modules
+dist
+coverage
+.env
+# Cliente de Prisma generado (se regenera con `prisma generate` en el build)
+/src/generated

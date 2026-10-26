@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: horario-postgres
+    environment:
+      POSTGRES_USER: horario
+      POSTGRES_PASSWORD: horario
+      POSTGRES_DB: horario
+    ports:
+      # 5433 en el host para no chocar con un Postgres local instalado en 5432
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U horario -d horario"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
