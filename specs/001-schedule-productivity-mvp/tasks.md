@@ -236,14 +236,14 @@ implementar.
 tests en verde antes del merge, preview por PR, migraciones de producción solo después del
 merge) y publicar el MVP en URLs públicas (SC-007, constitución II).
 
-- [ ] T076 [P] Add `frontend/vercel.json` with a rewrite of `/(.*)` to `/index.html` for SPA routing
-- [ ] T077 Create the Vercel project for the backend connected to the GitHub repo (Root Directory `backend`, framework NestJS, production branch `main`, build command `npx prisma migrate deploy && npm run build`) and link it with `vercel link` from `backend/`
-- [ ] T078 Install Neon Postgres from Vercel Marketplace and connect it to the backend project for Production **and** Preview with **"Create a database branch for each preview deployment" enabled**, so `prisma migrate deploy` in a preview build only touches that preview's Neon branch and the production database is migrated only by the production deploy after the merge; verify in `vercel env ls` that the Preview `DATABASE_URL` is not the production one. Then set `JWT_SECRET` (random, ≥ 32 chars, different for Production and Preview) and `CORS_ORIGIN` (production frontend domain + preview pattern from research R8) with `vercel env add`
-- [ ] T079 Create the Vercel project for the frontend connected to the same repo (Root Directory `frontend`, framework Vite, production branch `main`) and set `VITE_API_URL` to the backend production URL for Production and to the backend preview URL pattern/branch URL for Preview
+- [X] T076 [P] Add `frontend/vercel.json` with a rewrite of `/(.*)` to `/index.html` for SPA routing
+- [X] T077 Create the Vercel project for the backend connected to the GitHub repo (Root Directory `backend`, framework NestJS, production branch `main`, build command `npx prisma migrate deploy && npm run build`) and link it with `vercel link` from `backend/`
+- [X] T078 Install Neon Postgres from Vercel Marketplace and connect it to the backend project for Production **and** Preview with **"Create a database branch for each preview deployment" enabled**, so `prisma migrate deploy` in a preview build only touches that preview's Neon branch and the production database is migrated only by the production deploy after the merge; verify in `vercel env ls` that the Preview `DATABASE_URL` is not the production one. Then set `JWT_SECRET` (random, ≥ 32 chars, different for Production and Preview) and `CORS_ORIGIN` (production frontend domain + preview pattern from research R8) with `vercel env add`
+- [X] T079 Create the Vercel project for the frontend connected to the same repo (Root Directory `frontend`, framework Vite, production branch `main`) and set `VITE_API_URL` to the backend production URL for Production and to the backend preview URL pattern/branch URL for Preview
 - [ ] T080 Push the feature branch and open a pull request to `main` with `gh pr create` (summary of US1–US6 and a link to the spec); wait for both Vercel preview deployments and run the quickstart §5 walkthrough against the preview URLs; record them in the PR description
 - [ ] T081 Merge the pull request into `main` only if T073 is green (lint + unit + e2e in both packages) and the preview walkthrough of T080 passed; never merge with failing tests (constitution §Flujo, MUST)
-- [ ] T082 Verify the production deployments triggered by the merge: `GET <backend>/api/health` → `{"status":"ok"}`, the production Neon database has the migrations applied, and the frontend loads
-- [ ] T083 Run the quickstart §5 walkthrough against the production URLs and record both URLs in `README.md` (follow-up commit through a new small PR or directly as allowed by the reviewer)
+- [X] T082 Verify the production deployments triggered by the merge: `GET <backend>/api/health` → `{"status":"ok"}`, the production Neon database has the migrations applied, and the frontend loads
+- [X] T083 Run the quickstart §5 walkthrough against the production URLs and record both URLs in `README.md` (follow-up commit through a new small PR or directly as allowed by the reviewer)
 
 ---
 

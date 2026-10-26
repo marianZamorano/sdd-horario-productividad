@@ -86,6 +86,17 @@ Este repo ya está inicializado con
 volver a ejecutarlo. Abre la carpeta en VS Code con Claude Code y sigue
 [docs/prompts.md](docs/prompts.md) desde el paso 1.
 
+## Demo en producción (Vercel)
+
+| Parte | URL |
+|-------|-----|
+| Aplicación (frontend) | <https://horario-web-eosin.vercel.app> |
+| API (backend) | <https://horario-api-six.vercel.app/api> · health: [`/api/health`](https://horario-api-six.vercel.app/api/health) |
+
+Dos proyectos de Vercel (`horario-web` con Root Directory `frontend`, `horario-api` con
+`backend`) y Neon Postgres (`horario-db`) instalado desde Vercel Marketplace. El build del
+backend aplica las migraciones con `prisma migrate deploy`.
+
 ## Ejecutar el MVP en local
 Requisitos: Node 20.19+ (recomendado 24 LTS) y Docker Desktop.
 
@@ -122,4 +133,6 @@ Tests: `npm test` en `backend/` y `frontend/`; e2e del backend con `npm run test
   ([specs/001-schedule-productivity-mvp](specs/001-schedule-productivity-mvp/))
 - [x] Implementación del MVP: cuenta, disponibilidad, tareas, generador de horario, vista
   semanal, seguimiento de bloques y panel de productividad (T000–T075)
-- [ ] PR a `main` con preview y deploy en Vercel (T076–T083)
+- [x] Deploy en Vercel con Neon Postgres y flujo completo verificado en producción
+- [ ] Flujo PR + preview por feature (T080–T081): esta primera entrega se integró a `main`
+  con merge directo

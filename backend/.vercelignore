@@ -1,0 +1,8 @@
+# Nunca subir secretos ni la configuración local: en Vercel se usan sus variables de entorno.
+.env
+.env.*
+!.env.example
+node_modules
+dist
+coverage
+src/generated

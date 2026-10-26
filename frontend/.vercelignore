@@ -1,0 +1,7 @@
+# La URL de la API sale de la variable VITE_API_URL de Vercel, nunca del .env local.
+.env
+.env.*
+!.env.example
+node_modules
+dist
+coverage
