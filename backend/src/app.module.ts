@@ -7,6 +7,8 @@ import { AvailabilityModule } from './availability/availability.module';
 import { JwtAuthGuard } from './common/jwt-auth.guard';
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { ScheduleModule } from './schedule/schedule.module';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { PrismaModule } from './prisma/prisma.module';
     HealthModule,
     AuthModule,
     AvailabilityModule,
+    TasksModule,
+    ScheduleModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })

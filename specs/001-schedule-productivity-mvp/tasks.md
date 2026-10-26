@@ -126,18 +126,18 @@ implementar.
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T035 [P] [US3] Unit tests first for task ordering and derived fields (`compareTasks`: overdue → priority → deadline nulls last → createdAt → id; `isOverdue(task, now, tz)`; `remainingMinutes`) in `backend/src/tasks/task-rules.spec.ts`
-- [ ] T036 [P] [US3] E2E tests for contracts/tasks.md in `backend/test/tasks.e2e-spec.ts`: create 201 with derived fields, title/duration (multiple of 5, 15–1440)/priority validation 400, list order and `status` filter, PATCH fields, PATCH `status` DONE/PENDING toggles `completedAt`, DELETE 204 cascades blocks, 401, user B → 404 on GET-by-list/PATCH/DELETE of A's task
-- [ ] T037 [P] [US3] Component tests for the task form and list (validation, priority labels alta/media/baja, overdue badge, delete confirmation) in `frontend/src/pages/TasksPage.test.tsx`
+- [X] T035 [P] [US3] Unit tests first for task ordering and derived fields (`compareTasks`: overdue → priority → deadline nulls last → createdAt → id; `isOverdue(task, now, tz)`; `remainingMinutes`) in `backend/src/tasks/task-rules.spec.ts`
+- [X] T036 [P] [US3] E2E tests for contracts/tasks.md in `backend/test/tasks.e2e-spec.ts`: create 201 with derived fields, title/duration (multiple of 5, 15–1440)/priority validation 400, list order and `status` filter, PATCH fields, PATCH `status` DONE/PENDING toggles `completedAt`, DELETE 204 cascades blocks, 401, user B → 404 on GET-by-list/PATCH/DELETE of A's task
+- [X] T037 [P] [US3] Component tests for the task form and list (validation, priority labels alta/media/baja, overdue badge, delete confirmation) in `frontend/src/pages/TasksPage.test.tsx`
 
 ### Implementation for User Story 3
 
-- [ ] T038 [US3] Implement `compareTasks`, `isOverdue` and `remainingMinutes` as pure functions in `backend/src/tasks/task-rules.ts`; run T035 until green
-- [ ] T039 [P] [US3] Create `CreateTaskDto`, `UpdateTaskDto` (adds optional `status`) and `ListTasksQueryDto` in `backend/src/tasks/dto/`
-- [ ] T040 [US3] Implement `TasksService` (scoped by `userId`, computes `completedMinutes` from COMPLETED blocks, `toTaskDto` with derived fields, `status` transitions with `completedAt`, reevaluates DONE when `durationMinutes` changes, cascade delete) in `backend/src/tasks/tasks.service.ts`
-- [ ] T041 [US3] Implement `TasksController` and `TasksModule` (export `TasksService`) in `backend/src/tasks/tasks.controller.ts` and `backend/src/tasks/tasks.module.ts`; run T036 until green
-- [ ] T042 [P] [US3] Add task API hooks (`useTasks`, `useCreateTask`, `useUpdateTask`, `useDeleteTask`) in `frontend/src/api/tasks.ts`
-- [ ] T043 [US3] Build `TasksPage` with `TaskForm` and `TaskList` (remaining minutes, status, overdue badge, mark done/reopen, confirm before delete) in `frontend/src/pages/TasksPage.tsx`, `frontend/src/components/TaskForm.tsx`, `frontend/src/components/TaskList.tsx`; run T037 until green
+- [X] T038 [US3] Implement `compareTasks`, `isOverdue` and `remainingMinutes` as pure functions in `backend/src/tasks/task-rules.ts`; run T035 until green
+- [X] T039 [P] [US3] Create `CreateTaskDto`, `UpdateTaskDto` (adds optional `status`) and `ListTasksQueryDto` in `backend/src/tasks/dto/`
+- [X] T040 [US3] Implement `TasksService` (scoped by `userId`, computes `completedMinutes` from COMPLETED blocks, `toTaskDto` with derived fields, `status` transitions with `completedAt`, reevaluates DONE when `durationMinutes` changes, cascade delete) in `backend/src/tasks/tasks.service.ts`
+- [X] T041 [US3] Implement `TasksController` and `TasksModule` (export `TasksService`) in `backend/src/tasks/tasks.controller.ts` and `backend/src/tasks/tasks.module.ts`; run T036 until green
+- [X] T042 [P] [US3] Add task API hooks (`useTasks`, `useCreateTask`, `useUpdateTask`, `useDeleteTask`) in `frontend/src/api/tasks.ts`
+- [X] T043 [US3] Build `TasksPage` with `TaskForm` and `TaskList` (remaining minutes, status, overdue badge, mark done/reopen, confirm before delete) in `frontend/src/pages/TasksPage.tsx`, `frontend/src/components/TaskForm.tsx`, `frontend/src/components/TaskList.tsx`; run T037 until green
 
 **Checkpoint**: US1–US3 completas; ya hay datos suficientes para generar horarios.
 
@@ -151,21 +151,21 @@ implementar.
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T044 [P] [US4] Unit tests first for `generateSchedule()` in `backend/src/schedule/scheduler.spec.ts` covering spec US4 scenarios 1–7 with exact times: priority order; deadline tie-break; partition 120 → 50/45/25 and 60 → 35/25; task < 25 min as one block; 5-min break between consecutive blocks and around kept blocks; no block in the past (`now` mid-week rounded up to 5); no block after a non-overdue deadline (`NO_SPACE_BEFORE_DEADLINE`); overdue tasks first with no deadline limit; `NO_SPACE` leftovers; gaps < 25 min skipped; no slots → all unassigned; no tasks → empty; determinism (same input twice → deep-equal output); a property-style check over random inputs asserting no overlaps and every block inside a slot
-- [ ] T045 [P] [US4] Performance unit test: 50 tasks and 14 slots generate in < 50 ms in `backend/src/schedule/scheduler.perf.spec.ts`
-- [ ] T046 [P] [US4] E2E tests for `GET /api/schedule` and `POST /api/schedule/generate` (contracts/schedule.md) in `backend/test/schedule.e2e-spec.ts`: `weekStart` not a Monday 400, generate 200 with blocks + `unassigned`, `hasAvailability`/`hasPendingTasks` flags, regenerate keeps COMPLETED/SKIPPED blocks (seeded) and replaces PLANNED, pending minutes discount PLANNED blocks of other weeks, 401, user B never sees or affects A's blocks
-- [ ] T047 [P] [US4] Component tests for `WeekGrid` (7 columns Mon–Sun, block positioned by local time, overdue styling) and the unassigned panel in `frontend/src/components/WeekGrid.test.tsx`
+- [X] T044 [P] [US4] Unit tests first for `generateSchedule()` in `backend/src/schedule/scheduler.spec.ts` covering spec US4 scenarios 1–7 with exact times: priority order; deadline tie-break; partition 120 → 50/45/25 and 60 → 35/25; task < 25 min as one block; 5-min break between consecutive blocks and around kept blocks; no block in the past (`now` mid-week rounded up to 5); no block after a non-overdue deadline (`NO_SPACE_BEFORE_DEADLINE`); overdue tasks first with no deadline limit; `NO_SPACE` leftovers; gaps < 25 min skipped; no slots → all unassigned; no tasks → empty; determinism (same input twice → deep-equal output); a property-style check over random inputs asserting no overlaps and every block inside a slot
+- [X] T045 [P] [US4] Performance unit test: 50 tasks and 14 slots generate in < 50 ms in `backend/src/schedule/scheduler.perf.spec.ts`
+- [X] T046 [P] [US4] E2E tests for `GET /api/schedule` and `POST /api/schedule/generate` (contracts/schedule.md) in `backend/test/schedule.e2e-spec.ts`: `weekStart` not a Monday 400, generate 200 with blocks + `unassigned`, `hasAvailability`/`hasPendingTasks` flags, regenerate keeps COMPLETED/SKIPPED blocks (seeded) and replaces PLANNED, pending minutes discount PLANNED blocks of other weeks, 401, user B never sees or affects A's blocks
+- [X] T047 [P] [US4] Component tests for `WeekGrid` (7 columns Mon–Sun, block positioned by local time, overdue styling) and the unassigned panel in `frontend/src/components/WeekGrid.test.tsx`
 
 ### Implementation for User Story 4
 
-- [ ] T048 [P] [US4] Define pure domain types `SchedulerInput`, `ScheduleResult`, `UnassignedReason` and constants `MIN_BLOCK=25`, `MAX_BLOCK=50`, `BREAK=5` in `backend/src/schedule/scheduler.types.ts`
-- [ ] T049 [US4] Implement `generateSchedule()` in `backend/src/schedule/scheduler.ts` per research R5 and spec FR-011–FR-017 (free intervals from slots → UTC via `common/time.ts`, clip to `now`, subtract kept blocks ±5 min, order with `compareTasks`, partition rule, deadline clipping, unassigned reasons) with no I/O; run T044 and T045 until green
-- [ ] T050 [P] [US4] Create `WeekQueryDto` and `GenerateScheduleDto` (`weekStart` `YYYY-MM-DD` + Monday validator) in `backend/src/schedule/dto/`
-- [ ] T051 [US4] Implement `ScheduleService.getWeek()` and `ScheduleService.generate()` (single Prisma transaction: delete the week's PLANNED blocks, load slots, PENDING tasks with `pendingMinutes` = duration − completed − PLANNED minutes in other weeks, kept blocks, call `generateSchedule(now, user.timezone)`, insert blocks, map to `GenerateResultDto` with task title/category/priority/overdue) in `backend/src/schedule/schedule.service.ts`
-- [ ] T052 [US4] Implement `ScheduleController` (`GET /schedule`, `POST /schedule/generate`) and `ScheduleModule` in `backend/src/schedule/schedule.controller.ts` and `backend/src/schedule/schedule.module.ts`; run T046 until green
-- [ ] T053 [P] [US4] Add schedule API hooks (`useWeek(weekStart)`, `useGenerate`) in `frontend/src/api/schedule.ts`
-- [ ] T054 [US4] Build `WeekGrid` and `BlockCard` (CSS grid with 7 day columns, rows by time, blocks positioned in the user's timezone, overdue badge) in `frontend/src/components/WeekGrid.tsx` and `frontend/src/components/BlockCard.tsx`
-- [ ] T055 [US4] Build `WeekPage` (week selector with previous/next week, "Generar horario" button, `UnassignedPanel` with minutes and reason in Spanish, empty-state messages when there are no slots or no pending tasks) in `frontend/src/pages/WeekPage.tsx` and `frontend/src/components/UnassignedPanel.tsx`; run T047 until green
+- [X] T048 [P] [US4] Define pure domain types `SchedulerInput`, `ScheduleResult`, `UnassignedReason` and constants `MIN_BLOCK=25`, `MAX_BLOCK=50`, `BREAK=5` in `backend/src/schedule/scheduler.types.ts`
+- [X] T049 [US4] Implement `generateSchedule()` in `backend/src/schedule/scheduler.ts` per research R5 and spec FR-011–FR-017 (free intervals from slots → UTC via `common/time.ts`, clip to `now`, subtract kept blocks ±5 min, order with `compareTasks`, partition rule, deadline clipping, unassigned reasons) with no I/O; run T044 and T045 until green
+- [X] T050 [P] [US4] Create `WeekQueryDto` and `GenerateScheduleDto` (`weekStart` `YYYY-MM-DD` + Monday validator) in `backend/src/schedule/dto/`
+- [X] T051 [US4] Implement `ScheduleService.getWeek()` and `ScheduleService.generate()` (single Prisma transaction: delete the week's PLANNED blocks, load slots, PENDING tasks with `pendingMinutes` = duration − completed − PLANNED minutes in other weeks, kept blocks, call `generateSchedule(now, user.timezone)`, insert blocks, map to `GenerateResultDto` with task title/category/priority/overdue) in `backend/src/schedule/schedule.service.ts`
+- [X] T052 [US4] Implement `ScheduleController` (`GET /schedule`, `POST /schedule/generate`) and `ScheduleModule` in `backend/src/schedule/schedule.controller.ts` and `backend/src/schedule/schedule.module.ts`; run T046 until green
+- [X] T053 [P] [US4] Add schedule API hooks (`useWeek(weekStart)`, `useGenerate`) in `frontend/src/api/schedule.ts`
+- [X] T054 [US4] Build `WeekGrid` and `BlockCard` (CSS grid with 7 day columns, rows by time, blocks positioned in the user's timezone, overdue badge) in `frontend/src/components/WeekGrid.tsx` and `frontend/src/components/BlockCard.tsx`
+- [X] T055 [US4] Build `WeekPage` (week selector with previous/next week, "Generar horario" button, `UnassignedPanel` with minutes and reason in Spanish, empty-state messages when there are no slots or no pending tasks) in `frontend/src/pages/WeekPage.tsx` and `frontend/src/components/UnassignedPanel.tsx`; run T047 until green
 
 **Checkpoint**: MVP núcleo (US1–US4) demostrable: cuenta → disponibilidad → tareas → horario generado.
 

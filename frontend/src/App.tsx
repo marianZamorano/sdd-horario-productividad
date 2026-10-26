@@ -6,6 +6,8 @@ import { AvailabilityPage } from './pages/AvailabilityPage';
 import { LoginPage } from './pages/LoginPage';
 import { Placeholder } from './pages/Placeholder';
 import { RegisterPage } from './pages/RegisterPage';
+import { TasksPage } from './pages/TasksPage';
+import { WeekPage } from './pages/WeekPage';
 
 const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -17,8 +19,8 @@ const router = createBrowserRouter([
         element: <Layout />,
         children: [
           { index: true, element: <Navigate to="/week" replace /> },
-          { path: '/week', element: <Placeholder title="Semana" /> },
-          { path: '/tasks', element: <Placeholder title="Tareas" /> },
+          { path: '/week', element: <WeekPage /> },
+          { path: '/tasks', element: <TasksPage /> },
           { path: '/availability', element: <AvailabilityPage /> },
           { path: '/stats', element: <Placeholder title="Productividad" /> },
         ],
