@@ -93,9 +93,39 @@ volver a ejecutarlo. Abre la carpeta en VS Code con Claude Code y sigue
 | Aplicación (frontend) | <https://horario-web-eosin.vercel.app> |
 | API (backend) | <https://horario-api-six.vercel.app/api> · health: [`/api/health`](https://horario-api-six.vercel.app/api/health) |
 
-Dos proyectos de Vercel (`horario-web` con Root Directory `frontend`, `horario-api` con
-`backend`) y Neon Postgres (`horario-db`) instalado desde Vercel Marketplace. El build del
-backend aplica las migraciones con `prisma migrate deploy`.
+Dos proyectos de Vercel (`horario-web` y `horario-api`, ambos con Root Directory `.` y
+desplegados desde `frontend/` y `backend/`) y Neon Postgres (`horario-db`) instalado desde
+Vercel Marketplace y conectado solo al entorno Production de `horario-api`.
+
+Solo despliega el pipeline de GitHub Actions desde `main` (el auto-deploy por Git de Vercel
+está desactivado). Las migraciones las aplica el job `backend / deploy` con
+`prisma migrate deploy` antes de desplegar; el build de Vercel ya no migra. Cada despliegue
+aparece en el repositorio en **Deployments → production**.
+
+> Relanzar a mano ("Re-run") una ejecución antigua de `main` vuelve a desplegar ese commit
+> y sus migraciones; para recuperarse de un fallo es preferible hacer push de un arreglo.
+
+## CI/CD (GitHub Actions)
+
+| Workflow | Cuándo | Qué hace |
+|----------|--------|----------|
+| `backend` | push a cualquier rama que toque `backend/` | `validate`: lint, unit, e2e contra Postgres desechable, build y prueba de arranque. En `main`, además `deploy`: migraciones y despliegue de `horario-api` |
+| `frontend` | push a cualquier rama que toque `frontend/` | `validate`: lint, unit, build y prueba de arranque. En `main`, además `deploy` de `horario-web` |
+| `integration` | push a `main` | backend y frontend compilados juntos: health, frontend servido y CORS (informativo, no bloquea) |
+
+Detalle en [specs/002-ci-cd-pipeline/contracts/ci-workflows.md](specs/002-ci-cd-pipeline/contracts/ci-workflows.md).
+
+Los secretos viven en el GitHub Environment **`production`** (Settings → Environments),
+que solo admite la rama `main`; no hay secretos a nivel de repositorio. Se cargan con
+`gh secret set <NOMBRE> --env production` (el valor por stdin, nunca en el repo):
+
+| Secreto | Cómo obtenerlo |
+|---------|----------------|
+| `VERCEL_TOKEN` | Vercel → Account Settings → Tokens, con alcance al equipo de los proyectos |
+| `VERCEL_ORG_ID` | `orgId` de `backend/.vercel/project.json` |
+| `VERCEL_PROJECT_ID_API` | `projectId` de `backend/.vercel/project.json` |
+| `VERCEL_PROJECT_ID_WEB` | `projectId` de `frontend/.vercel/project.json` |
+| `PROD_DATABASE_URL` | `DATABASE_URL_UNPOOLED` del entorno Production de `horario-api` (conexión directa de Neon, sin `-pooler`) |
 
 ## Ejecutar el MVP en local
 Requisitos: Node 20.19+ (recomendado 24 LTS) y Docker Desktop.
@@ -119,7 +149,9 @@ npm run dev
 ```
 
 Tests: `npm test` en `backend/` y `frontend/`; e2e del backend con `npm run test:e2e`
-(usan solo la base `horario_test`). Guía de validación completa:
+(usan solo la base `horario_test`). Antes de hacer push a `main`, ejecuta en los paquetes
+afectados el lint sin autocorrección (`npm run lint:ci` en `backend/`, `npm run lint` en
+`frontend/`) y los tests. Guía de validación completa:
 [specs/001-schedule-productivity-mvp/quickstart.md](specs/001-schedule-productivity-mvp/quickstart.md).
 
 > En local, `backend/.env` tiene prioridad sobre variables de entorno globales del sistema

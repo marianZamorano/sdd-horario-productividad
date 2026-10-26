@@ -88,3 +88,99 @@ jobs:
       - name: Log del backend
         if: failure()
         run: cat backend.log || true
+
+  # Solo main; los secretos viven en el Environment `production`, que solo admite main
+  # (FR-019a). Orden: build → migraciones → despliegue → verificación (research R9).
+  deploy:
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: production
+      url: https://horario-api-six.vercel.app/api/health
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_API }}
+      PROD_API_URL: https://horario-api-six.vercel.app
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Comprobar secretos
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID_API: ${{ secrets.VERCEL_PROJECT_ID_API }}
+          PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+        run: |
+          missing=0
+          for name in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID_API PROD_DATABASE_URL; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Falta el secreto $name"
+              missing=1
+            fi
+          done
+          exit $missing
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Instalar CLI de Vercel
+        run: npm install --global vercel@65.2.0
+
+      - name: Descargar configuración
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Build de Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+
+      # Sin reintento: si falla, no se despliega (FR-013).
+      - name: Migraciones de producción
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          DATABASE_URL_UNPOOLED: ${{ secrets.PROD_DATABASE_URL }}
+        run: npx prisma migrate deploy
+
+      # Un reintento ante un fallo de la plataforma (FR-013a).
+      - name: Desplegar en Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          for attempt in 1 2; do
+            if url=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"); then
+              echo "Desplegado \`horario-api\`: $url" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            if [ "$attempt" -eq 1 ]; then
+              echo "::warning::Falló el despliegue en Vercel; se reintenta en 15 s"
+              sleep 15
+            fi
+          done
+          echo "::error::El despliegue en Vercel falló también en el reintento"
+          exit 1
+
+      # Sin reintento ni rollback: si falla, el job queda en rojo (FR-013b).
+      - name: Verificar producción
+        run: |
+          body=$(curl --silent --fail --retry 30 --retry-delay 2 --retry-connrefused \
+            --retry-all-errors --max-time 5 "$PROD_API_URL/api/health") || {
+            echo "::error::Producción no respondió en /api/health"
+            exit 1
+          }
+          if [ "$body" != '{"status":"ok"}' ]; then
+            echo "::error::Respuesta inesperada de /api/health en producción: $body"
+            exit 1
+          fi
